@@ -1,0 +1,112 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,jsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#021A54',
+          50:  '#E8EEF8',
+          100: '#C5D3EF',
+          200: '#9FB6E4',
+          300: '#7999D9',
+          400: '#4A73C8',
+          500: '#021A54',
+          600: '#011545',
+          700: '#011040',
+          800: '#010D35',
+          900: '#010A2C',
+        },
+        secondary: {
+          DEFAULT: '#0A2A7A',
+          50:  '#E8EEF8',
+          100: '#C5D3EC',
+          200: '#9FB6DF',
+          300: '#7999D2',
+          400: '#4A6BBF',
+          500: '#0A2A7A',
+          600: '#08236A',
+          700: '#071C5A',
+          800: '#05164A',
+          900: '#040F3A',
+        },
+        accent: {
+          DEFAULT: '#FF85BB',
+          50:  '#FFF0F7',
+          100: '#FFD6EA',
+          200: '#FFBCDD',
+          300: '#FFA2CF',
+          400: '#FF93C5',
+          500: '#FF85BB',
+          600: '#FF6BAF',
+          700: '#FF519E',
+          800: '#FF378E',
+          900: '#FF1D7D',
+        },
+        'soft-accent': '#FFCEE3',
+        background: '#F5F5F5',
+        border: '#E5E7EB',
+        'text-primary': '#1F2937',
+        'text-muted':   '#6B7280',
+        success: '#16A34A',
+        warning: '#F59E0B',
+        danger:  '#DC2626',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      },
+      borderRadius: {
+        DEFAULT: '0.5rem',
+        lg:  '0.75rem',
+        xl:  '1rem',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+      },
+      transitionDuration: {
+        250: '250ms',
+      },
+      boxShadow: {
+        card:        '0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
+        'card-hover':'0 4px 12px 0 rgb(0 0 0 / 0.10), 0 2px 4px -1px rgb(0 0 0 / 0.06)',
+        dropdown:    '0 10px 25px -5px rgb(0 0 0 / 0.10), 0 4px 6px -2px rgb(0 0 0 / 0.04)',
+        sidebar:     '2px 0 8px 0 rgb(0 0 0 / 0.04)',
+        topbar:      '0 1px 4px 0 rgb(0 0 0 / 0.06)',
+        modal:       '0 20px 60px -10px rgb(0 0 0 / 0.20)',
+      },
+      animation: {
+        'fade-in':   'fadeIn 0.3s ease-in-out',
+        'slide-up':  'slideUp 0.3s ease-out',
+        'slide-in':  'slideIn 0.25s ease-out',
+        'spin-slow': 'spin 1.5s linear infinite',
+        'pulse-soft':'pulseSoft 2s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%':   { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%':   { transform: 'translateY(12px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)',    opacity: '1' },
+        },
+        slideIn: {
+          '0%':   { transform: 'translateX(-12px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)',      opacity: '1' },
+        },
+        pulseSoft: {
+          '0%, 100%': { opacity: '1' },
+          '50%':      { opacity: '0.4' },
+        },
+      },
+      spacing: {
+        '4.5': '1.125rem',
+        '18':  '4.5rem',
+        '22':  '5.5rem',
+      },
+    },
+  },
+  plugins: [],
+}

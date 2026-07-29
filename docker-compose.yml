@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vaultx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vaultx}
+      POSTGRES_USER: ${POSTGRES_USER:-vaultx}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vaultx_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vaultx-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vaultx} -d ${POSTGRES_DB:-vaultx}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  vaultx-backend:
+    build:
+      context: ./vaultx-backend
+      dockerfile: Dockerfile
+    container_name: vaultx-backend
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-vaultx}
+      - DB_USERNAME=${POSTGRES_USER:-vaultx}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-vaultx_password}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-604800000}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vaultx-network
+    volumes:
+      - backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/v1/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  vaultx-frontend:
+    build:
+      context: ./vaultx-frontend
+      dockerfile: Dockerfile
+    container_name: vaultx-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      vaultx-backend:
+        condition: service_healthy
+    networks:
+      - vaultx-network
+
+volumes:
+  postgres_data:
+    driver: local
+  backend_logs:
+    driver: local
+
+networks:
+  vaultx-network:
+    driver: bridge
+    name: vaultx-network

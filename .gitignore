@@ -1,0 +1,30 @@
+# Ignore IDE files
+.idea/
+.vscode/
+*.iml
+
+# Ignore build directories
+vaultx-backend/target/
+vaultx-frontend/dist/
+vaultx-frontend/build/
+vaultx-frontend/.vite/
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore node_modules
+node_modules/
+npm-debug.log*
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore environment variables
+.env
+.env.*
+.env.local
+.env.production
+.env.test
+.env.example

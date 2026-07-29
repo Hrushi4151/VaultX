@@ -1,0 +1,3 @@
+ALTER TABLE users
+ADD COLUMN country VARCHAR(50),
+ADD COLUMN vault_pin_hash VARCHAR(255);

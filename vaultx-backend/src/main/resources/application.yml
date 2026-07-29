@@ -1,0 +1,109 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: vaultx-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/vaultx}
+    username: ${DB_USERNAME:vaultx}
+    password: ${DB_PASSWORD:vaultx_1234}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: VaultXHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    out-of-order: false
+    validate-on-migrate: true
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+vaultx:
+  jwt:
+    # Base64-encoded 256-bit HMAC-SHA256 key. Override via JWT_SECRET env var.
+    # Generate: openssl rand -base64 32
+    secret: ${JWT_SECRET:dGhpcy1pcy1hLXZlcnktbG9uZy1hbmQtc2VjdXJlLWp3dC1zZWNyZXQta2V5LWZvci12YXVsdHg=}
+    expiration: ${JWT_EXPIRATION:86400000}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    token-prefix: "Bearer "
+    header-name: "Authorization"
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174}
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:5173}
+  minio:
+    url: ${MINIO_URL:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    bucket-name: ${MINIO_BUCKET_NAME:vaultx-documents}
+  app:
+    version: 1.0.0
+    name: VaultX
+  pingram:
+    api-key: ${PINGRAM_API_KEY:mock_pingram_api_key}
+  ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY:AIzaSyCChgO-9VuefUphqSb7Y7Qsg3ZVqdHhqxs}
+      model: ${GEMINI_MODEL:gemini-3.6-flash}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  show-actuator: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    app:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.vaultx: DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/vaultx.log
