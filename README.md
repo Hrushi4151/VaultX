@@ -2,11 +2,6 @@
   <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg" alt="VaultX Logo" width="100"/>
   <h1>VaultX Enterprise</h1>
   <p><b>Your Secure Digital Document Vault & Smart AI Engine</b></p>
-
-  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-  [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
-  [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
-  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
 </div>
 
 <br/>
@@ -82,5 +77,4 @@ npm run dev
 - Advanced watermark injection for shared documents
 - Desktop/Mobile clients using Tauri or React Native
 
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
