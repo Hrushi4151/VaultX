@@ -1,80 +1,423 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg" alt="VaultX Logo" width="100"/>
-  <h1>VaultX Enterprise</h1>
-  <p><b>Your Secure Digital Document Vault & Smart AI Engine</b></p>
+
+# VaultX
+
+### Enterprise Secure Digital Document Management Platform
+
+*A production-ready full-stack document management platform built with **Java 21**, **Spring Boot 3**, **React.js**, **PostgreSQL**, and **MinIO**.*
+
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-success)
+![React](https://img.shields.io/badge/React-18-61DAFB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
+![MinIO](https://img.shields.io/badge/MinIO-Object%20Storage-C72E29)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 </div>
-
-<br/>
-
-VaultX is an enterprise-grade document management system designed to be highly secure, completely offline-capable, and intelligently powered. It seamlessly blends the file-management ease of Google Drive with the security of a digital locker and the intelligence of an AI assistant.
 
 ---
 
-## ✨ Features
+# 📖 Overview
 
-- **Secure Document Management**: Upload, preview, organize, and encrypt files effortlessly.
-- **Intelligent Document Engine**: Built-in OCR (Apache Tika + Tesseract) to extract text, paired with an offline AI heuristics engine to automatically categorize files (Passports, Invoices, etc.) and extract metadata without expensive cloud API keys.
-- **Smart Bundles**: Group files together for specific life events (e.g., "College Admission", "Visa Application") for lightning-fast retrieval.
-- **Enterprise Admin Portal**: A dedicated command center with Chart.js analytics, RBAC (Role-Based Access Control), and comprehensive audit logging.
-- **Secure Public Sharing**: Generate time-expiring, tokenized public links for your documents.
-- **PDF Processing Toolkit**: Native backend generation and manipulation of PDF files.
+VaultX is a **production-ready enterprise document management platform** designed to securely store, organize, process, and share digital documents through a modern SaaS experience.
 
-## 📸 Screenshots
+Inspired by **DigiLocker, Google Drive, Dropbox, and Adobe Acrobat**, VaultX combines secure object storage, intelligent document organization, advanced PDF processing, OCR-powered document search, reusable document bundles, and enterprise-grade security into a single application.
 
-> *(Placeholders for repository images)*
-> - `![Dashboard](/docs/dashboard.png)`
-> - `![Smart Search](/docs/search.png)`
-> - `![Admin Portal](/docs/admin.png)`
+The project demonstrates modern software engineering practices including **Clean Architecture**, **RESTful API design**, **JWT Authentication**, **Role-Based Access Control (RBAC)**, **Dockerized deployment**, and scalable backend development using Spring Boot.
 
-## 🛠️ Tech Stack
+---
 
-### Backend
-- **Java 21** & **Spring Boot 3**
-- **Spring Security** (Stateless JWT)
-- **PostgreSQL 16** (Primary DB & Full-Text Search)
-- **MinIO** (S3-compatible Object Storage)
-- **Apache Tika & Tess4J** (OCR)
+# ✨ Features
 
-### Frontend
-- **React 18** (Vite)
-- **Tailwind CSS** (Styling)
-- **React Router v6**
-- **Axios** (API Client)
-- **Chart.js** (Admin Analytics)
+## 🔐 Authentication & Security
 
-## 🚀 Installation & Local Development
+- JWT Authentication
+- Refresh Token Authentication
+- Email Verification
+- Forgot Password
+- Reset Password
+- Change Password
+- BCrypt Password Encryption
+- Role-Based Access Control (RBAC)
+- Vault PIN Security
+- Session Management
+- Login History
+- Multi-device Login
+- Security Audit Logs
 
-### 1. Prerequisites
-- Docker & Docker Compose
+---
+
+## 📂 Secure Document Management
+
+- Single & Multiple File Upload
+- Drag & Drop Upload
+- Secure Object Storage using MinIO
+- File Preview
+- Rename Documents
+- Archive & Restore
+- Soft Delete & Recycle Bin
+- Favorites
+- Categories
+- Tags
+- Collections
+- Duplicate Detection
+- SHA-256 File Integrity Verification
+- Search & Filtering
+
+---
+
+## 🎓 Smart Student Toolkit
+
+Organize documents into reusable bundles for common workflows.
+
+### Built-in Templates
+
+- Placement
+- Internship
+- Scholarship
+- Higher Education
+- Government Verification
+- Visa Application
+- Job Application
+- Personal Documents
+
+### Features
+
+- Create Custom Bundles
+- Drag & Drop Document Ordering
+- Bundle Templates
+- Bundle Preview
+- Favorite Bundles
+- Bundle History
+
+---
+
+## 📄 PDF Toolkit
+
+- Merge PDFs
+- Merge Images into PDF
+- Split PDF
+- Rearrange Pages
+- Rotate Pages
+- Extract Pages
+- Delete Pages
+- Watermark
+- Cover Page Generation
+- Automatic Table of Contents
+- Page Numbering
+- Password Protected PDFs
+- PDF Compression
+- Export History
+
+---
+
+## 🔍 OCR & Document Intelligence
+
+- OCR Text Extraction
+- Search Inside Scanned Documents
+- Metadata Extraction
+- Smart Document Categorization
+- Duplicate Detection
+- Document Type Recognition
+- Expiry Detection
+- Smart Tags
+- Smart Search
+
+---
+
+## 🔗 Secure Sharing
+
+- Public Share Links
+- Password Protected Links
+- QR Code Sharing
+- Download Limits
+- Link Expiration
+- View Only Mode
+- Email Sharing
+- Share Analytics
+- Document Verification Page
+
+---
+
+## 👨‍💼 Enterprise Admin Portal
+
+- User Management
+- Document Management
+- Category Management
+- Storage Analytics
+- Audit Logs
+- Security Dashboard
+- System Settings
+- Platform Monitoring
+
+---
+
+# 🏗 System Architecture
+
+```text
+                    React.js Frontend
+                           │
+                           ▼
+                  Spring Boot REST API
+                           │
+        ┌──────────────────┴──────────────────┐
+        │                                     │
+        ▼                                     ▼
+ PostgreSQL Database                 MinIO Object Storage
+```
+
+---
+
+# 📦 Tech Stack
+
+## Backend
+
+- Java 21
+- Spring Boot 3
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- PostgreSQL
+- MinIO
+- JWT Authentication
+- BCrypt Password Encoder
+- Apache PDFBox
+- Apache Tika
+- Tess4J (Tesseract OCR)
+- MapStruct
+- Bean Validation
+- Swagger / OpenAPI
+- Maven
+
+---
+
+## Frontend
+
+- React.js
+- JavaScript
+- Vite
+- Tailwind CSS
+- React Router
+- Axios
+- React Hook Form
+- React DnD
+- PDF.js
+- Lucide React
+
+---
+
+## DevOps & Tools
+
+- Docker
+- Docker Compose
+- Git
+- GitHub
+- IntelliJ IDEA
+- Postman
+
+---
+
+# 📁 Project Structure
+
+```text
+VaultX
+│
+├── vaultx-backend
+│   ├── src
+│   │   ├── config
+│   │   ├── controller
+│   │   ├── dto
+│   │   ├── entity
+│   │   ├── exception
+│   │   ├── mapper
+│   │   ├── repository
+│   │   ├── security
+│   │   ├── service
+│   │   └── util
+│   ├── Dockerfile
+│   └── pom.xml
+│
+├── vaultx-frontend
+│   ├── src
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── context
+│   │   ├── hooks
+│   │   ├── layouts
+│   │   ├── pages
+│   │   ├── services
+│   │   ├── styles
+│   │   └── utils
+│   └── package.json
+│
+├── docs
+│   ├── architecture.md
+│   ├── api.md
+│   ├── database.md
+│   └── screenshots
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+# 📸 Screenshots
+
+> Screenshots will be added after the UI implementation.
+
+- Landing Page
+- Authentication
+- Dashboard
+- Document Explorer
+- PDF Toolkit
+- Smart Bundles
+- OCR Search
+- Secure Sharing
+- Admin Portal
+
+---
+
+# 🚀 Getting Started
+
+## Prerequisites
+
 - Java 21+
 - Node.js 18+
+- PostgreSQL
+- Docker
+- Docker Compose
+- Maven
 
-### 2. Infrastructure Setup
-Spin up the required PostgreSQL and MinIO containers:
+---
+
+## Clone Repository
+
 ```bash
-docker-compose up -d
+git clone https://github.com/<your-username>/vaultx.git
+
+cd vaultx
 ```
 
-### 3. Backend Setup
-Navigate to the `vaultx-backend` directory and run the Spring Boot application:
+---
+
+## Backend
+
 ```bash
 cd vaultx-backend
-mvn clean spring-boot:run
-```
-*Note: Flyway will automatically run the database migrations on startup.*
 
-### 4. Frontend Setup
-Navigate to the `vaultx-frontend` directory and start the Vite dev server:
+mvn clean install
+
+mvn spring-boot:run
+```
+
+---
+
+## Frontend
+
 ```bash
 cd vaultx-frontend
+
 npm install
+
 npm run dev
 ```
 
-## 🗺️ Roadmap
-- Multi-factor Authentication (MFA)
-- Real-time collaborative document editing
-- Advanced watermark injection for shared documents
-- Desktop/Mobile clients using Tauri or React Native
+---
 
+## Run using Docker
 
+```bash
+docker-compose up --build
+```
+
+---
+
+# 📚 API Documentation
+
+Swagger UI
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+OpenAPI JSON
+
+```
+http://localhost:8080/v3/api-docs
+```
+
+---
+
+# 🎯 Project Highlights
+
+- Enterprise-grade architecture
+- Clean Architecture
+- SOLID Principles
+- RESTful API Design
+- JWT Authentication
+- Object Storage with MinIO
+- OCR-powered Document Search
+- Advanced PDF Processing
+- Secure Document Sharing
+- Responsive React.js UI
+- Dockerized Deployment
+- Modular Codebase
+- Production-ready Backend
+
+---
+
+# 🚀 Future Enhancements
+
+- Multi-Factor Authentication (MFA)
+- AI-powered Document Assistant
+- Digital Signature Integration
+- Mobile Application
+- Workflow Automation
+- Version Comparison
+- Real-time Notifications
+- Cloud Storage Integrations
+- Desktop Client
+
+---
+
+# 📖 Learning Outcomes
+
+This project demonstrates practical experience with:
+
+- Enterprise Java Development
+- Spring Boot
+- Spring Security
+- JWT Authentication
+- REST API Development
+- PostgreSQL
+- Object Storage
+- OCR Processing
+- PDF Processing
+- React.js
+- Tailwind CSS
+- Docker
+- Clean Architecture
+- SOLID Principles
+- Full Stack Development
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Hrushikesh More**
+
+- GitHub: https://github.com/<your-username>
+- LinkedIn: https://linkedin.com/in/<your-profile>
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a **⭐ Star** on GitHub.
