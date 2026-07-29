@@ -403,20 +403,9 @@ This project demonstrates practical experience with:
 
 ---
 
-# 📄 License
-
-This project is licensed under the MIT License.
-
----
-
 # 👨‍💻 Author
 
 **Hrushikesh More**
-
-- GitHub: https://github.com/<your-username>
-- LinkedIn: https://linkedin.com/in/<your-profile>
-
----
 
 ## ⭐ Support
 
