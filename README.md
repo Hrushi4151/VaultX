@@ -1,17 +1,21 @@
 <div align="center">
 
-# VaultX
+# 🔐 VaultX Enterprise
 
-### Enterprise Secure Digital Document Management Platform
+### Secure Digital Document Vault with Intelligent Document Management
 
-*A production-ready full-stack document management platform built with **Java 21**, **Spring Boot 3**, **React.js**, **PostgreSQL**, and **MinIO**.*
+*A modern enterprise-grade document management platform built with Java Spring Boot & React, designed to securely store, organize, process, and share digital documents.*
 
-![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-success)
-![React](https://img.shields.io/badge/React-18-61DAFB)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
-![MinIO](https://img.shields.io/badge/MinIO-Object%20Storage-C72E29)
-![License](https://img.shields.io/badge/License-MIT-green)
+<p>
+
+![Java](https://img.shields.io/badge/Java-21-red?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=springboot)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+</p>
 
 </div>
 
@@ -19,156 +23,185 @@
 
 # 📖 Overview
 
-VaultX is a **production-ready enterprise document management platform** designed to securely store, organize, process, and share digital documents through a modern SaaS experience.
+VaultX Enterprise is a full-stack document management platform inspired by enterprise digital locker systems such as DigiLocker and Google Drive.
 
-Inspired by **DigiLocker, Google Drive, Dropbox, and Adobe Acrobat**, VaultX combines secure object storage, intelligent document organization, advanced PDF processing, OCR-powered document search, reusable document bundles, and enterprise-grade security into a single application.
+It enables users to securely store, organize, search, process, bundle, and share important documents while providing enterprise-level security, role-based access control, intelligent document analysis, and PDF processing capabilities.
 
-The project demonstrates modern software engineering practices including **Clean Architecture**, **RESTful API design**, **JWT Authentication**, **Role-Based Access Control (RBAC)**, **Dockerized deployment**, and scalable backend development using Spring Boot.
+The project demonstrates modern backend architecture using **Spring Boot**, **Spring Security**, **JWT Authentication**, **PostgreSQL**, **MinIO Object Storage**, and a responsive **React** frontend.
 
 ---
 
-# ✨ Features
+# ✨ Key Features
 
 ## 🔐 Authentication & Security
 
 - JWT Authentication
-- Refresh Token Authentication
-- Email Verification
-- Forgot Password
-- Reset Password
-- Change Password
+- Refresh Token Support
+- Email OTP Verification
+- Password Reset
+- Session Management
+- Device Session Tracking
+- PIN Protection
 - BCrypt Password Encryption
 - Role-Based Access Control (RBAC)
-- Vault PIN Security
-- Session Management
-- Login History
-- Multi-device Login
-- Security Audit Logs
+- Rate Limiting
+- Request Logging
+- Correlation ID Tracking
+- Global Exception Handling
 
 ---
 
-## 📂 Secure Document Management
+## 📁 Document Management
 
-- Single & Multiple File Upload
-- Drag & Drop Upload
-- Secure Object Storage using MinIO
+- Upload Documents
+- Download Documents
+- Delete & Restore Documents
+- Trash Management
+- Folder / Collection Management
+- Categories & Tags
+- Metadata Storage
 - File Preview
-- Rename Documents
-- Archive & Restore
-- Soft Delete & Recycle Bin
-- Favorites
-- Categories
-- Tags
-- Collections
-- Duplicate Detection
-- SHA-256 File Integrity Verification
-- Search & Filtering
+- Version Ready Architecture
+- MinIO Object Storage
 
 ---
 
-## 🎓 Smart Student Toolkit
+## 📦 Smart Document Bundles
 
-Organize documents into reusable bundles for common workflows.
+Create grouped document collections for various use cases.
 
-### Built-in Templates
+Examples:
 
-- Placement
-- Internship
-- Scholarship
-- Higher Education
-- Government Verification
+- College Admission
 - Visa Application
-- Job Application
-- Personal Documents
+- Passport Renewal
+- Job Applications
+- Government Verification
 
-### Features
+Features
 
-- Create Custom Bundles
-- Drag & Drop Document Ordering
-- Bundle Templates
-- Bundle Preview
-- Favorite Bundles
-- Bundle History
+- Drag & Drop Ordering
+- Bundle Settings
+- Bundle Activity Tracking
+- Document Reordering
+- Multiple Documents per Bundle
 
 ---
 
 ## 📄 PDF Toolkit
 
+Professional PDF utilities built directly into the application.
+
 - Merge PDFs
-- Merge Images into PDF
-- Split PDF
-- Rearrange Pages
-- Rotate Pages
-- Extract Pages
-- Delete Pages
-- Watermark
-- Cover Page Generation
-- Automatic Table of Contents
-- Page Numbering
+- Export Documents to PDF
 - Password Protected PDFs
-- PDF Compression
-- Export History
+- Watermark PDFs
+- PDF Templates
+- PDF Settings
 
 ---
 
-## 🔍 OCR & Document Intelligence
+## 🤖 Intelligent Document Engine
 
-- OCR Text Extraction
-- Search Inside Scanned Documents
-- Metadata Extraction
-- Smart Document Categorization
+Built-in AI-powered document utilities.
+
+- OCR Processing
+- Smart Categorization
 - Duplicate Detection
-- Document Type Recognition
-- Expiry Detection
-- Smart Tags
-- Smart Search
+- Metadata Extraction
+- AI Insights Dashboard
+- Expiring Document Detection
+- Intelligent Search
 
 ---
 
-## 🔗 Secure Sharing
+## 🔎 Smart Search
 
-- Public Share Links
-- Password Protected Links
-- QR Code Sharing
-- Download Limits
-- Link Expiration
-- View Only Mode
-- Email Sharing
-- Share Analytics
-- Document Verification Page
+Search documents using
+
+- File Name
+- Category
+- Tags
+- OCR Extracted Text
+- Metadata
+- Collections
+
+---
+
+## 🔗 Secure Document Sharing
+
+Share documents securely using temporary public links.
+
+Features include
+
+- Expiration Date
+- Public Token Links
+- Download Tracking
+- View Tracking
+- Access Analytics
 
 ---
 
 ## 👨‍💼 Enterprise Admin Portal
 
+Administrative dashboard with complete platform monitoring.
+
+Includes
+
 - User Management
-- Document Management
-- Category Management
-- Storage Analytics
-- Audit Logs
-- Security Dashboard
-- System Settings
-- Platform Monitoring
+- Dashboard Analytics
+- System Statistics
+- Security Logs
+- Activity Monitoring
+- Admin Logs
 
 ---
 
-# 🏗 System Architecture
+## 🔔 Notifications
 
-```text
-                    React.js Frontend
-                           │
-                           ▼
-                  Spring Boot REST API
-                           │
-        ┌──────────────────┴──────────────────┐
-        │                                     │
-        ▼                                     ▼
- PostgreSQL Database                 MinIO Object Storage
+- In-App Notifications
+- Security Alerts
+- Document Alerts
+- Expiry Notifications
+
+---
+
+## 📊 Dashboard
+
+Interactive dashboard displaying
+
+- Total Documents
+- Storage Usage
+- Categories
+- Recent Activity
+- AI Insights
+- Shared Documents
+- Bundles
+- Notifications
+
+---
+
+# 🏗️ Architecture
+
+```
+                React Frontend
+                       │
+                       ▼
+              Spring Boot REST API
+                       │
+ ┌──────────────┬──────────────┬──────────────┐
+ │              │              │              │
+ ▼              ▼              ▼              ▼
+Security     Business      PDF Engine     AI Engine
+ Layer         Logic
+ │              │
+ ▼              ▼
+ PostgreSQL   MinIO Object Storage
 ```
 
 ---
 
-# 📦 Tech Stack
+# 🛠 Tech Stack
 
 ## Backend
 
@@ -176,127 +209,105 @@ Organize documents into reusable bundles for common workflows.
 - Spring Boot 3
 - Spring Security
 - Spring Data JPA
-- Hibernate
 - PostgreSQL
-- MinIO
+- Flyway Migration
 - JWT Authentication
-- BCrypt Password Encoder
-- Apache PDFBox
-- Apache Tika
-- Tess4J (Tesseract OCR)
 - MapStruct
 - Bean Validation
-- Swagger / OpenAPI
+- MinIO Object Storage
+- Apache Tika
+- Tess4J OCR
 - Maven
 
 ---
 
 ## Frontend
 
-- React.js
-- JavaScript
+- React 18
 - Vite
+- JavaScript
 - Tailwind CSS
 - React Router
 - Axios
-- React Hook Form
-- React DnD
-- PDF.js
-- Lucide React
+- Context API
+- Chart.js
 
 ---
 
-## DevOps & Tools
+## DevOps
 
 - Docker
 - Docker Compose
 - Git
 - GitHub
-- IntelliJ IDEA
-- Postman
 
 ---
 
-# 📁 Project Structure
+# 📂 Project Structure
 
-```text
-VaultX
+```
+vaultx/
+
+├── vaultx-backend/
 │
-├── vaultx-backend
-│   ├── src
-│   │   ├── config
-│   │   ├── controller
-│   │   ├── dto
-│   │   ├── entity
-│   │   ├── exception
-│   │   ├── mapper
-│   │   ├── repository
-│   │   ├── security
-│   │   ├── service
-│   │   └── util
-│   ├── Dockerfile
-│   └── pom.xml
-│
-├── vaultx-frontend
-│   ├── src
-│   │   ├── assets
-│   │   ├── components
-│   │   ├── context
-│   │   ├── hooks
-│   │   ├── layouts
-│   │   ├── pages
-│   │   ├── services
-│   │   ├── styles
-│   │   └── utils
-│   └── package.json
-│
-├── docs
-│   ├── architecture.md
-│   ├── api.md
-│   ├── database.md
-│   └── screenshots
+├── vaultx-frontend/
 │
 ├── docker-compose.yml
+│
 └── README.md
 ```
 
 ---
 
-# 📸 Screenshots
+# 🗄 Database
 
-> Screenshots will be added after the UI implementation.
+- PostgreSQL
+- Flyway Versioned Migrations
+- Entity Relationships
+- Optimized Indexes
 
-- Landing Page
-- Authentication
-- Dashboard
-- Document Explorer
-- PDF Toolkit
-- Smart Bundles
-- OCR Search
-- Secure Sharing
-- Admin Portal
+Major entities include
+
+- User
+- Role
+- Session
+- RefreshToken
+- Document
+- Collection
+- Category
+- Bundle
+- Share
+- Notification
+- SecurityLog
+- PDF Export
+- OCR Result
+
+---
+
+# 🔒 Security Features
+
+- Stateless JWT Authentication
+- Refresh Token Rotation
+- BCrypt Password Encryption
+- Secure Password Reset
+- Email Verification
+- Request Rate Limiting
+- Role-Based Authorization
+- Correlation IDs
+- Request Logging
+- Exception Handling
+- Input Validation
 
 ---
 
 # 🚀 Getting Started
 
-## Prerequisites
-
-- Java 21+
-- Node.js 18+
-- PostgreSQL
-- Docker
-- Docker Compose
-- Maven
-
----
-
 ## Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/vaultx.git
+git clone https://github.com/Hrushi4151/VaultX.git
 
-cd vaultx
+cd VaultX
 ```
 
 ---
@@ -325,81 +336,45 @@ npm run dev
 
 ---
 
-## Run using Docker
+## Docker
 
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
 
 ---
 
-# 📚 API Documentation
+# 📌 Future Enhancements
 
-Swagger UI
-
-```
-http://localhost:8080/swagger-ui/index.html
-```
-
-OpenAPI JSON
-
-```
-http://localhost:8080/v3/api-docs
-```
-
----
-
-# 🎯 Project Highlights
-
-- Enterprise-grade architecture
-- Clean Architecture
-- SOLID Principles
-- RESTful API Design
-- JWT Authentication
-- Object Storage with MinIO
-- OCR-powered Document Search
-- Advanced PDF Processing
-- Secure Document Sharing
-- Responsive React.js UI
-- Dockerized Deployment
-- Modular Codebase
-- Production-ready Backend
-
----
-
-# 🚀 Future Enhancements
-
-- Multi-Factor Authentication (MFA)
-- AI-powered Document Assistant
-- Digital Signature Integration
+- Face Authentication
+- Biometric Login
 - Mobile Application
-- Workflow Automation
-- Version Comparison
-- Real-time Notifications
-- Cloud Storage Integrations
-- Desktop Client
+- Document Versioning
+- Digital Signature Support
+- OCR Accuracy Improvements
+- AI Chat Assistant
+- Redis Caching
+- Elasticsearch
+- Kafka Event Streaming
+- Multi-language Support
 
 ---
 
-# 📖 Learning Outcomes
+# 🎯 Learning Outcomes
 
-This project demonstrates practical experience with:
+This project demonstrates practical experience with
 
-- Enterprise Java Development
-- Spring Boot
-- Spring Security
-- JWT Authentication
-- REST API Development
-- PostgreSQL
-- Object Storage
-- OCR Processing
-- PDF Processing
-- React.js
-- Tailwind CSS
-- Docker
+- Enterprise Backend Development
 - Clean Architecture
-- SOLID Principles
-- Full Stack Development
+- REST API Design
+- Authentication & Authorization
+- Object Storage
+- PDF Processing
+- OCR Integration
+- Spring Security
+- Database Design
+- React Application Development
+- Docker Deployment
 
 ---
 
@@ -407,6 +382,22 @@ This project demonstrates practical experience with:
 
 **Hrushikesh More**
 
-## ⭐ Support
+GitHub: https://github.com/Hrushi4151
 
-If you found this project useful, consider giving it a **⭐ Star** on GitHub.
+---
+
+# ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
+
+---
+
+<div align="center">
+
+### Built with ❤️ using Java Spring Boot & React
+
+**VaultX Enterprise**
+
+*Secure • Intelligent • Modern*
+
+</div>
