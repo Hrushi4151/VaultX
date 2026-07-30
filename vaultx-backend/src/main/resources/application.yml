@@ -68,7 +68,7 @@ vaultx:
     api-key: ${PINGRAM_API_KEY:mock_pingram_api_key}
   ai:
     gemini:
-      api-key: ${GEMINI_API_KEY:AIzaSyCChgO-9VuefUphqSb7Y7Qsg3ZVqdHhqxs}
+      api-key: ${GEMINI_API_KEY:APIKEY}
       model: ${GEMINI_MODEL:gemini-3.6-flash}
 
 springdoc:
