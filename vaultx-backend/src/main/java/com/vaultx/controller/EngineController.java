@@ -57,15 +57,29 @@ public class EngineController {
         return ResponseEntity.ok(aiClassificationService.analyzeDocument(documentId));
     }
 
+    @PostMapping(value = "/ai/analyze-preview", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Preview AI suggestions for a file before uploading")
+    public ResponseEntity<AiDocumentAnalysisDto> analyzePreview(@RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        AiDocumentAnalysisDto analysis = aiClassificationService.analyzePreview(file);
+        if (analysis == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(analysis);
+    }
+
     @PostMapping("/ai/apply-suggestions/{documentId}")
     @Operation(summary = "Apply AI smart suggestions to a document")
     public ResponseEntity<com.vaultx.dto.document.DocumentDto> applySuggestions(
             @PathVariable UUID documentId,
-            @RequestParam(required = false) String suggestedName,
-            @RequestParam(required = false) String categoryName,
-            @RequestParam(required = false) String collectionName,
-            @RequestParam(required = false) List<String> tags) {
-        return ResponseEntity.ok(aiClassificationService.applySuggestions(documentId, suggestedName, categoryName, collectionName, tags));
+            @RequestBody java.util.Map<String, Object> payload) {
+        
+        String suggestedName = payload.containsKey("suggestedName") ? (String) payload.get("suggestedName") : null;
+        String categoryName = payload.containsKey("categoryName") ? (String) payload.get("categoryName") : null;
+        String collectionName = payload.containsKey("collectionName") ? (String) payload.get("collectionName") : null;
+        List<String> tags = payload.containsKey("tags") ? (List<String>) payload.get("tags") : null;
+        String ocrText = payload.containsKey("ocrText") ? (String) payload.get("ocrText") : null;
+
+        return ResponseEntity.ok(aiClassificationService.applySuggestions(documentId, suggestedName, categoryName, collectionName, tags, ocrText));
     }
 
     @GetMapping("/ai/summary")

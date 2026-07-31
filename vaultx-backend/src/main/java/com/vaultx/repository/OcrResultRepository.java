@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface OcrResultRepository extends JpaRepository<OcrResult, UUID> {
-    Optional<OcrResult> findByDocumentId(UUID documentId);
+    Optional<OcrResult> findFirstByDocumentIdOrderByProcessedAtDesc(UUID documentId);
     java.util.List<OcrResult> findByDocumentOwnerIdAndDocumentDeletedFalse(UUID ownerId);
 }

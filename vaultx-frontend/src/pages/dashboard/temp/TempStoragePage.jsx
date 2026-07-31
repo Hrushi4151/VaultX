@@ -110,7 +110,7 @@ export default function TempStoragePage() {
           <button
             type="button"
             onClick={() => setClearConfirm(true)}
-            className="px-4 py-2.5 bg-red-50 text-red-600 font-bold text-xs rounded-xl hover:bg-red-100 transition-all flex items-center gap-1.5 self-start sm:self-center border border-red-100"
+            className="px-4 py-2.5 bg-red-50 text-red-600 font-bold text-xs rounded-xl hover:bg-red-100 transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto border border-red-100"
           >
             <Trash2 className="w-4 h-4" /> Clear All Files
           </button>
@@ -119,7 +119,7 @@ export default function TempStoragePage() {
 
       {/* Stats & Search Bar */}
       <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center gap-6 w-full md:w-auto">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 w-full md:w-auto justify-between sm:justify-start">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold">
               <FileText className="w-5 h-5" />
@@ -265,7 +265,7 @@ export default function TempStoragePage() {
                 <button
                   type="button"
                   onClick={() => handleRemove(file)}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100 flex-shrink-0"
                   title="Remove file"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -280,26 +280,26 @@ export default function TempStoragePage() {
       {previewModal.isOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="p-4 bg-slate-950 flex items-center justify-between border-b border-slate-800 px-6">
-              <div className="flex items-center gap-3 min-w-0">
+            <div className="p-4 bg-slate-950 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800 px-4 sm:px-6 gap-3 sm:gap-0">
+              <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto pr-8 sm:pr-0">
                 <Eye className="w-5 h-5 text-purple-400 flex-shrink-0" />
                 <h3 className="font-bold text-base text-white truncate">
                   {previewModal.title}
                 </h3>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 self-end sm:self-auto flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => handleDownload(previewModal.file)}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all"
                 >
-                  <Download className="w-4 h-4" /> Download File
+                  <Download className="w-4 h-4 flex-shrink-0" /> Download File
                 </button>
                 <button 
                   type="button"
                   onClick={() => setPreviewModal(prev => ({ ...prev, isOpen: false }))}
-                  className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+                  className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors absolute top-3 sm:top-auto sm:relative right-3 sm:right-auto"
                 >
                   <X className="w-5 h-5" />
                 </button>

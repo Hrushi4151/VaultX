@@ -14,6 +14,8 @@ public interface AuthService {
     void verifyEmail(String token);
     void verifyOtp(VerifyOtpRequest request);
     JwtAuthenticationResponse login(LoginRequest request, HttpServletRequest httpRequest);
+    JwtAuthenticationResponse walletLogin(WalletLoginRequest request, HttpServletRequest httpRequest);
+    JwtAuthenticationResponse faceLogin(FaceLoginRequest request, HttpServletRequest httpRequest);
     JwtAuthenticationResponse refreshToken(TokenRefreshRequest request, HttpServletRequest httpRequest);
     void logout(String refreshToken, HttpServletRequest httpRequest);
     void logoutAllDevices(HttpServletRequest httpRequest);

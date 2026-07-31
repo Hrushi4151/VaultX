@@ -46,13 +46,34 @@ public interface DocumentRepository extends JpaRepository<Document, UUID>, JpaSp
 
     Page<Document> findByOwnerIdAndDeletedTrue(UUID ownerId, Pageable pageable);
 
+    @Query("SELECT d FROM Document d " +
+           "LEFT JOIN OcrResult o ON o.document = d " +
+           "LEFT JOIN DocumentAiMetadata a ON a.document = d " +
+           "WHERE (LOWER(d.displayName) LIKE LOWER(CONCAT('%', :query, '%')) " +
+           "OR LOWER(d.description) LIKE LOWER(CONCAT('%', :query, '%')) " +
+           "OR LOWER(o.extractedText) LIKE LOWER(CONCAT('%', :query, '%')) " +
+           "OR LOWER(a.tagsJson) LIKE LOWER(CONCAT('%', :query, '%')) " +
+           "OR LOWER(a.detectedCategory) LIKE LOWER(CONCAT('%', :query, '%')) " +
+           "OR LOWER(a.detectedType) LIKE LOWER(CONCAT('%', :query, '%')))")
+    Page<Document> adminSmartSearch(@Param("query") String query, Pageable pageable);
+
     List<Document> findByDeletedTrue();
     
     Page<Document> findByOwnerIdAndFavouriteTrueAndDeletedFalse(UUID ownerId, Pageable pageable);
 
     long countByOwnerIdAndDeletedFalse(UUID ownerId);
+
+    @Query("SELECT COALESCE(SUM(d.fileSize), 0L) FROM Document d WHERE d.owner.id = :ownerId AND d.deleted = false")
+    Long sumFileSizeByOwnerIdAndDeletedFalse(@Param("ownerId") UUID ownerId);
+    
+    @Query("SELECT COALESCE(SUM(d.fileSize), 0L) FROM Document d")
+    Long sumTotalFileSize();
     
     boolean existsByOwnerIdAndDisplayNameAndIdNotAndDeletedFalse(UUID ownerId, String displayName, UUID id);
 
     boolean existsByStoredFilename(String storedFilename);
+
+    long countByOwnerId(UUID ownerId);
+
+    Page<Document> findByOriginalFilenameContainingIgnoreCase(String query, Pageable pageable);
 }

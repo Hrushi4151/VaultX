@@ -27,6 +27,8 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final com.vaultx.repository.DocumentRepository documentRepository;
+    private final com.vaultx.repository.ShareRepository shareRepository;
     private final UserMapper userMapper;
     private final SecurityUtils securityUtils;
     private final com.vaultx.service.SecurityLogService securityLogService;
@@ -47,6 +49,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByIdWithRoles(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString()));
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public User getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString()));
     }
 
     @Override
@@ -124,6 +132,64 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         securityLogService.logAction(user, com.vaultx.entity.SecurityAction.PIN_CHANGED, getClientIp(httpRequest));
+    }
+
+    @Override
+    @Transactional
+    public void updateFaceBiometrics(UUID id, String faceData) {
+        log.info("Updating face biometrics for user: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString()));
+        user.setFaceData(faceData);
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateWalletPassword(UUID id, String walletPassword) {
+        log.info("Updating wallet password for user: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString()));
+        user.setWalletPasswordHash(passwordEncoder.encode(walletPassword));
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean verifyVaultPin(UUID id, String pin) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString()));
+        if (user.getVaultPinHash() == null || user.getVaultPinHash().isEmpty()) {
+            return false;
+        }
+        return passwordEncoder.matches(pin, user.getVaultPinHash());
+    }
+
+    @Override
+    public com.vaultx.dto.user.UserStorageStatsDto getUserStorageStats(UUID userId) {
+        Long totalBytesObj = documentRepository.sumFileSizeByOwnerIdAndDeletedFalse(userId);
+        long totalBytes = totalBytesObj != null ? totalBytesObj : 0L;
+        long filesCount = documentRepository.countByOwnerIdAndDeletedFalse(userId);
+        long sharesCount = shareRepository.countByOwnerId(userId);
+
+        long maxLimit = 5368709120L; // 5.0 GB limit
+        double pct = ((double) totalBytes / maxLimit) * 100.0;
+
+        return com.vaultx.dto.user.UserStorageStatsDto.builder()
+                .totalBytesUsed(totalBytes)
+                .formattedSize(formatBytes(totalBytes))
+                .maxStorageLimitBytes(maxLimit)
+                .formattedLimit("5.0 GB")
+                .usedPercentage(Math.round(pct * 100.0) / 100.0)
+                .totalFilesCount(filesCount)
+                .totalShareLinksCount(sharesCount)
+                .build();
+    }
+
+    private String formatBytes(long bytes) {
+        if (bytes <= 0) return "0 B";
+        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+        return new java.text.DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     private String getClientIp(jakarta.servlet.http.HttpServletRequest request) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Share2, Plus, Globe, Lock, Link as LinkIcon, Trash2, Eye, Download, Search, AlertCircle, Copy } from 'lucide-react';
+import { Share2, Plus, Globe, Lock, Link as LinkIcon, Trash2, Eye, Download, Search, AlertCircle, Copy, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import shareService from '../../../services/shareService';
 
@@ -53,7 +53,7 @@ export default function SharesDashboard() {
         </div>
         <button 
           onClick={() => navigate('/dashboard/shares/create')}
-          className="btn-primary flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl shadow-md shadow-primary/20"
+          className="btn-primary flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl shadow-md shadow-primary/20 w-full sm:w-auto"
         >
           <Share2 className="w-5 h-5" />
           Create Share Link
@@ -150,7 +150,7 @@ export default function SharesDashboard() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity ml-auto lg:ml-0">
+                  <div className="flex items-center gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity ml-auto lg:ml-0">
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleCopy(share.token); }}
                       className="p-2.5 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-xl bg-white shadow-sm border border-gray-100 transition-all"

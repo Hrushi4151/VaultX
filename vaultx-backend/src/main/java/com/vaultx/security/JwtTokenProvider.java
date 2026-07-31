@@ -49,6 +49,16 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateToken(com.vaultx.entity.Admin admin) {
+        return Jwts.builder()
+                .claims(new HashMap<>())
+                .subject(admin.getEmail())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String generateRefreshToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())

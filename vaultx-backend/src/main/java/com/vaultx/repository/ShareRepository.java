@@ -12,5 +12,6 @@ import java.util.UUID;
 @Repository
 public interface ShareRepository extends JpaRepository<Share, UUID> {
     Page<Share> findByOwnerId(UUID ownerId, Pageable pageable);
+    long countByOwnerId(UUID ownerId);
     Optional<Share> findByToken(String token);
 }

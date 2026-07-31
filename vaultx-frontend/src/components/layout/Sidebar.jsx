@@ -30,6 +30,7 @@ const bottomItems = [
  */
 export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
+  const isAdmin = user?.roles?.some(r => ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'].includes(r.name));
 
   const NavItem = ({ item }) => (
     item.disabled ? (
@@ -90,10 +91,18 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Main nav */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Primary navigation">
-          <p className="px-3 mb-2 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-            Main
-          </p>
-          {navItems.map((item) => <NavItem key={item.label} item={item} />)}
+          {isAdmin ? (
+            <p className="px-3 mb-2 text-xs text-text-muted italic">
+              Admin Mode Active
+            </p>
+          ) : (
+            <>
+              <p className="px-3 mb-2 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+                Main
+              </p>
+              {navItems.map((item) => <NavItem key={item.label} item={item} />)}
+            </>
+          )}
 
           <div className="divider my-3" />
 
@@ -101,6 +110,16 @@ export default function Sidebar({ isOpen, onClose }) {
             Account
           </p>
           {bottomItems.map((item) => <NavItem key={item.label} item={item} />)}
+
+          {isAdmin && (
+            <>
+              <div className="divider my-3" />
+              <p className="px-3 mb-2 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+                Admin
+              </p>
+              <NavItem item={{ label: 'Admin Panel', href: '/admin', icon: Shield }} />
+            </>
+          )}
         </nav>
 
         {/* User footer */}

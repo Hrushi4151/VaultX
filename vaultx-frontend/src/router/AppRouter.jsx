@@ -22,6 +22,7 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import EmailVerificationPage from '../pages/auth/EmailVerificationPage';
+import AdminLogin from '../pages/admin/AdminLogin';
 
 // Pages — Dashboard
 import DashboardPage from '../pages/dashboard/DashboardPage';
@@ -67,6 +68,9 @@ import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminDocumentsPage from '../pages/admin/AdminDocumentsPage';
 import AdminSettingsPage from '../pages/admin/AdminSettingsPage';
+import AdminStoragePage from '../pages/admin/AdminStoragePage';
+import AdminAnalyticsPage from '../pages/admin/AdminAnalyticsPage';
+import AdminAuditLogsPage from '../pages/admin/AdminAuditLogsPage';
 
 // Pages — Errors
 import NotFoundPage from '../pages/errors/NotFoundPage';
@@ -107,6 +111,7 @@ export default function AppRouter() {
           <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
           <Route path="/reset-password" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
           <Route path="/verify-email" element={<PublicRoute><EmailVerificationPage /></PublicRoute>} />
+          <Route path="/admin/login" element={<PublicRoute><AdminLogin /></PublicRoute>} />
         </Route>
 
         {/* Public Share Route - Standalone (no standard headers/footers needed if it has its own layout) */}
@@ -173,9 +178,9 @@ export default function AppRouter() {
           <Route path="documents" element={<AdminDocumentsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           {/* Mocks for others */}
-          <Route path="analytics" element={<AdminDashboardPage />} />
-          <Route path="storage" element={<AdminDashboardPage />} />
-          <Route path="audit" element={<AdminDashboardPage />} />
+          <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route path="storage" element={<AdminStoragePage />} />
+          <Route path="audit" element={<AdminAuditLogsPage />} />
         </Route>
 
         {/* ── Error pages ────────────────────────────────── */}

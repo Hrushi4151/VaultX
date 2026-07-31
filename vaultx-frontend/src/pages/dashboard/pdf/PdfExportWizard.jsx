@@ -734,7 +734,7 @@ export default function PdfExportWizard() {
     );
     
     return (
-      <div className="h-[520px] flex flex-col lg:flex-row gap-6">
+      <div className="h-full flex flex-col lg:flex-row gap-6">
         {/* Left Column: Vault Selection & Local Upload */}
         <div className="lg:w-1/2 bg-white border border-gray-200 rounded-3xl p-5 flex flex-col shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -1184,7 +1184,7 @@ export default function PdfExportWizard() {
 
   // STEP 3: Interactive Live Preview with Document Tabs & Reload Button
   const renderStep3Preview = () => (
-    <div className="h-[560px] flex flex-col md:flex-row gap-6">
+    <div className="h-full flex flex-col md:flex-row gap-6">
       {/* Left Sidebar: Document Switcher Tabs */}
       <div className="md:w-64 bg-white border border-gray-200 rounded-3xl p-4 flex flex-col shadow-sm">
         <h4 className="font-bold text-gray-800 text-sm mb-3 px-1 flex items-center gap-2">
@@ -1351,7 +1351,7 @@ export default function PdfExportWizard() {
   );
 
   return (
-    <div className="h-full flex flex-col pb-8">
+    <div className="h-full flex flex-col pb-8 w-full max-w-full overflow-x-hidden">
       
       {/* Top Header */}
       <div className="flex items-center justify-between mb-6">
@@ -1372,16 +1372,19 @@ export default function PdfExportWizard() {
           {renderStepIndicator()}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50/50">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50/50 flex flex-col relative">
           {currentStep === 0 && renderStep0SelectAndArrange()}
           {currentStep === 1 && renderStep1Watermark()}
           {currentStep === 2 && renderStep2Security()}
           {currentStep === 3 && renderStep3Preview()}
           {currentStep === 4 && renderStep4Export()}
+          
+          {/* Spacer to prevent content from hiding behind fixed footer on mobile */}
+          {currentStep < 4 && <div className="h-20 md:hidden flex-shrink-0" />}
         </div>
 
         {currentStep < 4 && (
-          <div className="p-6 bg-white border-t border-gray-100 flex items-center justify-between">
+          <div className="fixed md:static bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t border-gray-100 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] md:shadow-none z-20">
             <button 
               onClick={handleBack}
               disabled={currentStep === 0}

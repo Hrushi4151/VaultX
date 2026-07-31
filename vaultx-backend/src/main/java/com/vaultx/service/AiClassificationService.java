@@ -9,5 +9,8 @@ import java.util.UUID;
 public interface AiClassificationService {
     void classifyDocument(UUID documentId);
     AiDocumentAnalysisDto analyzeDocument(UUID documentId);
-    DocumentDto applySuggestions(UUID documentId, String suggestedName, String categoryName, String collectionName, List<String> tags);
+
+    AiDocumentAnalysisDto analyzePreview(org.springframework.web.multipart.MultipartFile file);
+
+    DocumentDto applySuggestions(UUID documentId, String suggestedName, String categoryName, String collectionName, List<String> tags, String ocrText);
 }

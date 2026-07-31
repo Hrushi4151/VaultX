@@ -95,10 +95,12 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6 pb-8 max-w-7xl mx-auto">
       
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Enterprise Overview</h1>
-          <p className="text-sm text-gray-500 mt-1">Real-time telemetry and platform metrics</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" /> Admin Dashboard
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Real-time platform metrics and growth telemetry</p>
         </div>
       </div>
 

@@ -35,6 +35,7 @@ export default function DocumentDetailsPage() {
   const [description, setDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [copiedOcr, setCopiedOcr] = useState(false);
+  const [showOcrMobile, setShowOcrMobile] = useState(false);
 
   // AI Suggestions State & Modal
   const [aiAnalysis, setAiAnalysis] = useState(null);
@@ -319,91 +320,91 @@ export default function DocumentDetailsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6 pb-8">
+    <div className="h-full w-full max-w-full overflow-x-hidden flex flex-col space-y-4 sm:space-y-6 pb-8">
       
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100">
+        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
           <button 
             onClick={() => navigate('/dashboard/documents')}
-            className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-50 rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
             title="Back to Documents"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
           
-          <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center flex-shrink-0 font-bold">
-            <FileText className="w-6 h-6" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 font-bold">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-gray-800 truncate">{doc.displayName}</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate leading-tight">{doc.displayName}</h1>
               <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-1 text-gray-400 hover:text-primary transition-colors"
+                className="p-1 text-gray-400 hover:text-primary transition-colors flex-shrink-0"
                 title="Edit Properties"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
               {formatSize(doc.fileSize)} • {doc.mimeType} • Uploaded {new Date(doc.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
         
         {/* Quick Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           <button
             onClick={handleToggleFavourite}
-            className={`p-2.5 rounded-xl border transition-colors flex items-center gap-1.5 text-xs font-semibold ${
+            className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
               doc.favourite 
                 ? 'bg-amber-50 text-amber-600 border-amber-200' 
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <Star className={`w-4 h-4 ${doc.favourite ? 'fill-amber-400 text-amber-400' : ''}`} />
-            {doc.favourite ? 'Fav' : 'Favourite'}
+            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${doc.favourite ? 'fill-amber-400 text-amber-400' : ''}`} />
+            <span className="hidden sm:inline">{doc.favourite ? 'Fav' : 'Favourite'}</span>
           </button>
 
           <button
             onClick={handleToggleArchive}
-            className={`p-2.5 rounded-xl border transition-colors flex items-center gap-1.5 text-xs font-semibold ${
+            className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
               doc.archived 
                 ? 'bg-purple-50 text-purple-600 border-purple-200' 
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <Archive className="w-4 h-4" />
-            {doc.archived ? 'Unarchive' : 'Archive'}
+            <Archive className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">{doc.archived ? 'Unarchive' : 'Archive'}</span>
           </button>
 
           {/* Single Unified AI Suggestions Button */}
           <button 
             onClick={handleOpenAiModal}
             disabled={isAnalyzing}
-            className="px-4 py-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white font-bold rounded-xl transition-all shadow-md text-xs flex items-center gap-2 disabled:opacity-50 transform hover:scale-[1.02]"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white font-bold rounded-lg sm:rounded-xl transition-all shadow-md text-[10px] sm:text-xs flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 transform hover:scale-[1.02]"
           >
-            <Sparkles className={`w-4 h-4 text-yellow-300 ${isAnalyzing ? 'animate-spin' : ''}`} />
-            {isAnalyzing ? 'Analyzing with AI...' : '✨ AI Suggestions'}
+            <Sparkles className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300 ${isAnalyzing ? 'animate-spin' : ''}`} />
+            {isAnalyzing ? 'Analyzing...' : 'AI Suggestions'}
           </button>
 
           <button 
             onClick={handleDownload}
             disabled={isDownloading}
-            className="px-4 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors text-xs flex items-center gap-1.5 shadow-sm disabled:opacity-70"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-primary text-white font-bold rounded-lg sm:rounded-xl hover:bg-primary-dark transition-colors text-[10px] sm:text-xs flex items-center gap-1 sm:gap-1.5 shadow-sm disabled:opacity-70"
           >
-            {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            Download
+            {isDownloading ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+            <span className="hidden sm:inline">Download</span>
           </button>
 
           <button
             onClick={handleSoftDelete}
-            className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-colors border border-red-100"
+            className="p-2 sm:p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg sm:rounded-xl transition-colors border border-red-100"
             title="Move to Trash"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
@@ -640,25 +641,25 @@ export default function DocumentDetailsPage() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         
         {/* Left Column: Preview & OCR Extracted Text */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           
           {/* Document Preview Box */}
-          <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 h-[520px] flex items-center justify-center bg-gray-50/50 overflow-hidden relative">
+          <div className="bg-white p-2 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 h-[350px] sm:h-[450px] lg:h-[520px] flex items-center justify-center bg-gray-50/50 overflow-hidden relative">
             {previewUrl ? (
               doc.mimeType?.startsWith('image/') ? (
-                <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-2xl overflow-hidden group">
+                <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden group">
                   {/* Toolbar overlay */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-xl p-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                    <button onClick={() => setImgScale(s => s + 0.25)} className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom In"><ZoomIn className="w-4 h-4"/></button>
-                    <button onClick={() => setImgScale(s => Math.max(0.25, s - 0.25))} className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom Out"><ZoomOut className="w-4 h-4"/></button>
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-xl p-1.5 sm:p-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button onClick={() => setImgScale(s => s + 0.25)} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom In"><ZoomIn className="w-4 h-4"/></button>
+                    <button onClick={() => setImgScale(s => Math.max(0.25, s - 0.25))} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom Out"><ZoomOut className="w-4 h-4"/></button>
                     <div className="w-px h-5 bg-white/20 mx-1"></div>
-                    <button onClick={() => setImgRotation(r => r - 90)} className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Rotate Left"><RotateCcw className="w-4 h-4"/></button>
-                    <button onClick={() => setImgRotation(r => r + 90)} className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Rotate Right"><RotateCw className="w-4 h-4"/></button>
+                    <button onClick={() => setImgRotation(r => r - 90)} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Rotate Left"><RotateCcw className="w-4 h-4"/></button>
+                    <button onClick={() => setImgRotation(r => r + 90)} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Rotate Right"><RotateCw className="w-4 h-4"/></button>
                     <div className="w-px h-5 bg-white/20 mx-1"></div>
-                    <button onClick={() => { setImgScale(1); setImgRotation(0); }} className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Reset View"><Maximize className="w-4 h-4"/></button>
+                    <button onClick={() => { setImgScale(1); setImgRotation(0); }} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Reset View"><Maximize className="w-4 h-4"/></button>
                   </div>
 
                   <img 
@@ -669,27 +670,38 @@ export default function DocumentDetailsPage() {
                   />
                 </div>
               ) : doc.mimeType === 'application/pdf' ? (
-                <iframe src={previewUrl} title={doc.displayName} className="w-full h-full border-none rounded-2xl" />
+                <iframe src={previewUrl} title={doc.displayName} className="w-full h-full border-none rounded-xl sm:rounded-2xl" />
               ) : null
             ) : previewError ? (
-              <div className="text-center text-gray-400">
-                <FileWarning className="w-16 h-16 mx-auto mb-3 text-gray-300" />
-                <p className="font-medium text-gray-700">Preview not available for this file type</p>
+              <div className="text-center text-gray-400 p-4">
+                <FileWarning className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 text-gray-300" />
+                <p className="font-medium text-gray-700 text-sm sm:text-base">Preview not available for this file type</p>
                 <p className="text-xs mt-1 text-gray-400">Click download to inspect file contents.</p>
               </div>
             ) : (
               <div className="flex flex-col items-center text-gray-400">
-                <Loader2 className="w-10 h-10 animate-spin mb-3 text-primary/50" />
+                <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin mb-3 text-primary/50" />
                 <p className="text-sm">Loading preview...</p>
               </div>
             )}
           </div>
 
+          {/* Mobile OCR Toggle Button */}
+          <div className="lg:hidden">
+            <button 
+              onClick={() => setShowOcrMobile(!showOcrMobile)}
+              className="w-full py-3.5 bg-blue-50/50 hover:bg-blue-50 text-blue-600 rounded-2xl font-bold flex items-center justify-center gap-2 border border-blue-100 transition-colors shadow-sm"
+            >
+              <Search className="w-4 h-4"/> 
+              {showOcrMobile ? "Hide OCR Extracted Text" : "View Extracted OCR Text"}
+            </button>
+          </div>
+
           {/* OCR Extracted Text */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div className={`bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 ${showOcrMobile ? 'block' : 'hidden lg:block'}`}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                <Search className="w-5 h-5 text-blue-500"/> OCR Text Extraction
+              <h2 className="font-bold text-gray-800 text-base sm:text-lg flex items-center gap-2">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500"/> OCR Text Extraction
               </h2>
               <button 
                 onClick={() => {
@@ -699,14 +711,14 @@ export default function DocumentDetailsPage() {
                   setTimeout(() => setCopiedOcr(false), 2000);
                   toast.success('OCR text copied!');
                 }}
-                className="px-3 py-1 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-1 transition-colors"
+                className="px-3 py-1 text-[10px] sm:text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-1 transition-colors"
               >
                 {copiedOcr ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 {copiedOcr ? 'Copied' : 'Copy Text'}
               </button>
             </div>
             
-            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 h-52 overflow-y-auto text-sm text-gray-700 font-mono whitespace-pre-wrap leading-relaxed">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 h-40 sm:h-52 overflow-y-auto text-xs sm:text-sm text-gray-700 font-mono whitespace-pre-wrap leading-relaxed">
               [VaultX OCR Engine - Extracted Text]{"\n\n"}
               {aiAnalysis?.ocrText || "Text extracted using VaultX OCR engine. Full-text search active."}
             </div>

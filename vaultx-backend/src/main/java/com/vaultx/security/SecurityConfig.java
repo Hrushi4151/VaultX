@@ -36,6 +36,7 @@ public class SecurityConfig {
     /** URL patterns that bypass JWT authentication entirely. */
     private static final String[] PUBLIC_URLS = {
             "/api/v1/auth/**",
+            "/api/v1/admin/auth/**",
             "/api/v1/health",
             "/api/v1/health/**",
             "/swagger-ui/**",

@@ -56,16 +56,16 @@ export default function Topbar({ onMenuToggle, pageTitle = 'Dashboard' }) {
     <header className="h-16 bg-white border-b border-border shadow-topbar flex-shrink-0">
       <div className="flex items-center justify-between h-full px-4 sm:px-6">
         {/* Left: hamburger + title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={onMenuToggle}
-            className="lg:hidden p-2 rounded-lg text-text-muted hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg text-text-muted hover:bg-gray-100 transition-colors shrink-0"
             aria-label="Toggle sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-text-primary">{pageTitle}</h1>
+          <h1 className="text-lg font-semibold text-text-primary truncate">{pageTitle}</h1>
         </div>
 
         {/* Right: notifications + user menu */}

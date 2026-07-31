@@ -42,7 +42,8 @@ public class AdminUserServiceImpl implements AdminUserService {
                         .firstName(u.getFirstName())
                         .lastName(u.getLastName())
                         .profilePicture(u.getProfilePicture())
-                        .build()) // Note: in real app, we'd map active status too, adding it manually if missing in DTO
+                        .active(u.isActive())
+                        .build()) 
                 .collect(Collectors.toList());
 
         return PagedResponse.<UserDto>builder()

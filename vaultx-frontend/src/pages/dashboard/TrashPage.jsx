@@ -137,46 +137,46 @@ export default function TrashPage() {
 
   return (
     <div className="h-full flex flex-col pb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Trash2 className="w-6 h-6 text-red-500" />
-            Trash Manager (30-Day Auto Retention)
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 shrink-0" />
+            Trash Manager
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">
-            Documents in trash are automatically purged after 30 days. Reminders are sent via Email, SMS & In-App notification at 7 days and 1 day before expiration.
+          <p className="text-gray-500 mt-1 text-xs sm:text-sm">
+            Documents are automatically purged after 30 days. Reminders are sent 7 days and 1 day before expiration.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {hasSelection && (
-            <>
-              <span className="text-sm text-gray-500 mr-2">{selectedIds.size} selected</span>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-sm text-gray-500 mr-2 whitespace-nowrap">{selectedIds.size} selected</span>
               <button
                 onClick={() => setIsBatchRestoreModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 font-medium border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+                className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white text-gray-700 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
               >
-                <RotateCcw className="w-4 h-4" />
-                Restore
+                <RotateCcw className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">Restore</span>
               </button>
               <button
                 onClick={() => setIsBatchDeleteModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 font-medium border border-red-100 rounded-xl hover:bg-red-100 transition-colors shadow-sm"
+                className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-red-50 text-red-600 text-sm font-medium border border-red-100 rounded-xl hover:bg-red-100 transition-colors shadow-sm"
               >
-                <XCircle className="w-4 h-4" />
-                Delete
+                <XCircle className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">Delete</span>
               </button>
-            </>
+            </div>
           )}
 
-          <div className="hidden sm:block w-px h-8 bg-gray-200 mx-2"></div>
+          <div className="hidden lg:block w-px h-8 bg-gray-200 mx-1"></div>
 
           <button
             onClick={() => setIsEmptyTrashModalOpen(true)}
             disabled={documents.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50 w-full sm:w-auto mt-2 sm:mt-0"
           >
-            <AlertTriangle className="w-4 h-4" />
+            <AlertTriangle className="w-4 h-4 shrink-0" />
             Empty Trash
           </button>
         </div>
@@ -194,16 +194,16 @@ export default function TrashPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">
+                  <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-10 sm:w-12">
                     <button onClick={handleSelectAll} className="text-gray-400 hover:text-primary">
                       {selectedIds.size === documents.length ? <CheckSquare className="w-5 h-5 text-primary" /> : <Square className="w-5 h-5" />}
                     </button>
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Document Name</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deleted Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Retention Left</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Size</th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Document Name</th>
+                  <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deleted Date</th>
+                  <th className="px-3 sm:px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Retention</th>
+                  <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Size</th>
+                  <th className="px-3 sm:px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -215,34 +215,36 @@ export default function TrashPage() {
 
                   return (
                   <tr key={doc.id} className={`hover:bg-gray-50/50 transition-colors ${selectedIds.has(doc.id) ? 'bg-primary/5' : ''}`}>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <button onClick={() => handleToggleSelect(doc.id)} className="text-gray-400 hover:text-primary">
                         {selectedIds.has(doc.id) ? <CheckSquare className="w-5 h-5 text-primary" /> : <Square className="w-5 h-5" />}
                       </button>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center">
-                          <DocIcon mimeType={doc.mimeType} />
+                    <td className="px-3 sm:px-6 py-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
+                          <div className="scale-75 sm:scale-100">
+                            <DocIcon mimeType={doc.mimeType} />
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{doc.displayName}</p>
-                          <p className="text-xs text-gray-500">{doc.category?.name || 'Uncategorized'}</p>
+                        <div className="min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{doc.displayName}</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500 truncate">{doc.category?.name || 'Uncategorized'}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 hidden md:table-cell whitespace-nowrap text-sm text-gray-500">
                       {doc.deletedAt ? new Date(doc.deletedAt).toLocaleDateString() : new Date(doc.updatedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border ${badgeStyle}`}>
-                        ⏳ {rem <= 1 ? 'Purges in 1 day!' : `${rem} days left`}
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs border ${badgeStyle}`}>
+                        ⏳ <span className="hidden sm:inline">{rem <= 1 ? 'Purges in 1 day!' : `${rem} days left`}</span><span className="sm:hidden">{rem}d</span>
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 hidden sm:table-cell whitespace-nowrap text-sm text-gray-500">
                       {formatSize(doc.fileSize)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setDocToRestore(doc)}

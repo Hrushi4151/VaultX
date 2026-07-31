@@ -39,9 +39,12 @@ services:
       - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
       - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-604800000}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - AI_SERVICE_URL=http://vaultx-ai-service:8001
     depends_on:
       postgres:
         condition: service_healthy
+      vaultx-ai-service:
+        condition: service_started
     networks:
       - vaultx-network
     volumes:
@@ -64,6 +67,17 @@ services:
     depends_on:
       vaultx-backend:
         condition: service_healthy
+    networks:
+      - vaultx-network
+
+  vaultx-ai-service:
+    build:
+      context: ./vaultx-ai-service
+      dockerfile: Dockerfile
+    container_name: vaultx-ai-service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
     networks:
       - vaultx-network
 

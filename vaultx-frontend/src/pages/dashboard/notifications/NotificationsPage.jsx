@@ -21,8 +21,8 @@ export default function NotificationsPage() {
         notificationService.getAllNotifications(),
         notificationService.getUnreadCount()
       ]);
-      setNotifications(allRes.data || []);
-      setUnreadCount(countRes.data?.unreadCount || 0);
+      setNotifications(allRes.data?.data || []);
+      setUnreadCount(countRes.data?.data?.unreadCount || 0);
     } catch (err) {
       console.error('Failed to load notifications:', err);
       toast.error('Failed to load notifications');
@@ -148,7 +148,7 @@ export default function NotificationsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 self-end sm:self-center">
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center w-full sm:w-auto justify-start sm:justify-end">
           <button
             onClick={fetchNotifications}
             className="p-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all shadow-xs"
@@ -245,7 +245,7 @@ export default function NotificationsPage() {
             <div
               key={item.id}
               onClick={() => handleNotificationClick(item)}
-              className={`group relative p-4 rounded-2xl border transition-all duration-200 cursor-pointer flex items-start gap-4 ${
+              className={`group relative p-4 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-wrap sm:flex-nowrap items-start gap-4 ${
                 item.read 
                   ? 'bg-white border-gray-100 opacity-80 hover:opacity-100 hover:border-gray-200' 
                   : 'bg-white border-primary/20 shadow-xs ring-1 ring-primary/5 hover:border-primary/40'
@@ -262,7 +262,7 @@ export default function NotificationsPage() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 min-w-0 pr-6">
+              <div className="flex-1 min-w-0 pr-6 w-full sm:w-auto">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className={`text-sm font-bold ${item.read ? 'text-gray-800' : 'text-gray-900'}`}>
                     {item.title}
@@ -284,7 +284,7 @@ export default function NotificationsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-1 shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-2 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity w-full sm:w-auto justify-end sm:justify-start pt-2 sm:pt-0 border-t sm:border-0 border-gray-50 mt-2 sm:mt-0 self-center">
                 {!item.read && (
                   <button
                     onClick={(e) => handleMarkAsRead(item.id, e)}

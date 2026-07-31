@@ -22,9 +22,9 @@ public class AuthController {
 
     @PostMapping("/send-email-otp")
     @Operation(summary = "Send OTP to email for registration step 2")
-    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> sendEmailOtp(@Valid @RequestBody SendEmailOtpRequest request) {
-        String otp = authService.sendEmailOtp(request);
-        return ResponseEntity.ok(ApiResponse.success("OTP sent to your email", java.util.Map.of("otp", otp)));
+    public ResponseEntity<ApiResponse<Void>> sendEmailOtp(@Valid @RequestBody SendEmailOtpRequest request) {
+        authService.sendEmailOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP sent to your email", null));
     }
 
     @PostMapping("/verify-email-otp")
@@ -36,9 +36,9 @@ public class AuthController {
 
     @PostMapping("/send-mobile-otp")
     @Operation(summary = "Send OTP to mobile phone for registration step 2")
-    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> sendMobileOtp(@Valid @RequestBody SendMobileOtpRequest request) {
-        String otp = authService.sendMobileOtp(request);
-        return ResponseEntity.ok(ApiResponse.success("OTP sent to your mobile phone via SMS", java.util.Map.of("otp", otp)));
+    public ResponseEntity<ApiResponse<Void>> sendMobileOtp(@Valid @RequestBody SendMobileOtpRequest request) {
+        authService.sendMobileOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP sent to your mobile phone via SMS", null));
     }
 
     @PostMapping("/verify-mobile-otp")
@@ -76,6 +76,20 @@ public class AuthController {
     public ResponseEntity<ApiResponse<JwtAuthenticationResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         JwtAuthenticationResponse response = authService.login(request, httpRequest);
         return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+    }
+
+    @PostMapping("/wallet-login")
+    @Operation(summary = "Authenticate user using Wallet Password")
+    public ResponseEntity<ApiResponse<JwtAuthenticationResponse>> walletLogin(@Valid @RequestBody WalletLoginRequest request, HttpServletRequest httpRequest) {
+        JwtAuthenticationResponse response = authService.walletLogin(request, httpRequest);
+        return ResponseEntity.ok(ApiResponse.success("Wallet unlock successful", response));
+    }
+
+    @PostMapping("/face-login")
+    @Operation(summary = "Authenticate user using Face ID Biometrics")
+    public ResponseEntity<ApiResponse<JwtAuthenticationResponse>> faceLogin(@Valid @RequestBody FaceLoginRequest request, HttpServletRequest httpRequest) {
+        JwtAuthenticationResponse response = authService.faceLogin(request, httpRequest);
+        return ResponseEntity.ok(ApiResponse.success("Face ID authentication successful", response));
     }
 
     @PostMapping("/refresh")

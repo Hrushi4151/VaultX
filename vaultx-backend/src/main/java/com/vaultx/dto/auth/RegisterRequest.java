@@ -37,4 +37,8 @@ public class RegisterRequest {
 
     @AssertTrue(message = "You must accept the terms and conditions")
     private boolean termsAccepted;
+
+    private String walletPassword;
+
+    private String faceData;
 }

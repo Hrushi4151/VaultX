@@ -1032,30 +1032,31 @@ export default function PdfSplitWizard() {
   };
 
   return (
-    <div className="h-full flex flex-col pb-6 space-y-4">
+    <div className="h-full flex flex-col space-y-4 w-full max-w-full overflow-x-hidden relative">
 
       {/* --- Top Header Toolbar --- */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-3xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 min-w-0 w-full sm:w-auto">
           <button 
             onClick={() => navigate('/dashboard/pdf-toolkit')}
-            className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
+            className="p-2 flex-shrink-0 mt-1 sm:mt-0 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
             title="Back to PDF Toolkit"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Scissors className="w-5 h-5 text-emerald-600" /> Multi-Format PDF & Image Split-Merge Workspace
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-start sm:items-center gap-2 break-words">
+              <Scissors className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1 sm:mt-0" /> 
+              <span className="leading-tight">Multi-Format PDF & Image Split-Merge Workspace</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 mt-1">
               Extract, chunk, re-order, preview, sign, watermark, encrypt, and combine pages across PDFs and Images.
             </p>
           </div>
         </div>
 
         {/* Upload & Cloud Picker Controls */}
-        <div className="flex items-center gap-2 self-end sm:self-center">
+        <div className="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
 
           {sources.length > 0 && (
             <button
@@ -1074,7 +1075,7 @@ export default function PdfSplitWizard() {
       <div className="flex-1 grid lg:grid-cols-12 gap-6 min-h-[560px]">
 
         {/* ── LEFT WORKSPACE WITH 4 MAIN SUB-TABS (7 cols) ── */}
-        <div className="lg:col-span-7 bg-white border border-gray-200 rounded-3xl p-5 flex flex-col shadow-sm">
+        <div className="lg:col-span-7 bg-white border border-gray-200 rounded-3xl p-4 sm:p-5 flex flex-col shadow-sm min-w-0 overflow-hidden">
 
           {/* 4 Main Sub-Tabs Switcher Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-gray-100 p-1.5 rounded-2xl mb-4">
@@ -1124,13 +1125,13 @@ export default function PdfSplitWizard() {
           </div>
 
           {/* ── SUB-TAB 1: SOURCE DOCUMENTS & REORDERING (Preserved via CSS toggle) ── */}
-          <div className={leftTab === 'sources' ? 'flex-1 flex flex-col space-y-4' : 'hidden'}>
-            <div className="flex items-center justify-between">
-              <div>
+          <div className={leftTab === 'sources' ? 'flex-1 flex flex-col space-y-4 min-w-0' : 'hidden'}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="min-w-0 w-full sm:w-auto">
                 <h4 className="font-bold text-gray-800 text-sm">Loaded Source Files</h4>
-                <p className="text-xs text-gray-500">Drag cards or use <strong>↑ / ↓</strong> to set sequence for <strong>Merge All Sources</strong>.</p>
+                <p className="text-xs text-gray-500 truncate">Drag cards or use <strong>↑ / ↓</strong> to set sequence.</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
                 <label className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl cursor-pointer shadow-xs flex items-center gap-1.5 transition-all">
                   <Plus className="w-3.5 h-3.5" /> Add File
                   <input type="file" accept="application/pdf,image/*" multiple onChange={handleFileUpload} className="hidden" />
@@ -1142,7 +1143,7 @@ export default function PdfSplitWizard() {
                   className="px-3.5 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all border border-blue-200/60 shadow-xs"
                   title="Select document from Vault or 7-Day Temp Storage"
                 >
-                  <Shield className="w-3.5 h-3.5 text-blue-600" /> Vault & Temp Storage
+                  <Shield className="w-3.5 h-3.5 text-blue-600" /> Vault & Temp
                 </button>
               </div>
             </div>
@@ -1177,7 +1178,7 @@ export default function PdfSplitWizard() {
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 ${
+                                className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 ${
                                   snapshot.isDragging 
                                     ? 'bg-white border-blue-500 shadow-2xl scale-[1.02] z-50 ring-2 ring-blue-400/20'
                                     : activeSourceIndex === idx
@@ -1185,7 +1186,7 @@ export default function PdfSplitWizard() {
                                       : 'bg-white border-gray-200 hover:border-blue-300'
                                 }`}
                               >
-                                <div className="flex items-center gap-3 min-w-0">
+                                <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
                                   {/* Drag Handle */}
                                   <div 
                                     {...provided.dragHandleProps}
@@ -1216,21 +1217,21 @@ export default function PdfSplitWizard() {
                                   </div>
 
                                   {/* Document Meta Info */}
-                                  <div className="min-w-0">
+                                  <div className="min-w-0 flex-1">
                                     <p className="text-xs font-bold text-gray-800 truncate" title={src.name}>
                                       {src.name}
                                     </p>
-                                    <div className="flex items-center gap-2 text-[10px] text-gray-400 mt-1">
-                                      <span className="font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+                                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-400 mt-1">
+                                      <span className="font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full flex-shrink-0">
                                         {src.totalPages} Page(s)
                                       </span>
-                                      <span>{(src.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                                      <span className="flex-shrink-0">{(src.fileSize / 1024 / 1024).toFixed(2)} MB</span>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Document Actions & Order Arrows */}
-                                <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="flex items-center justify-end gap-2 flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                                   <div className="flex items-center gap-0.5 mr-1">
                                     <button
                                       type="button"
@@ -1960,19 +1961,30 @@ export default function PdfSplitWizard() {
         </div>
 
         {/* ── RIGHT WORKSPACE: Generated Split Chunks Panel & Reordering (5 cols) ── */}
-        <div className="lg:col-span-5 bg-slate-50 border border-gray-200 rounded-3xl p-5 flex flex-col shadow-sm">
+        <div className="lg:col-span-5 bg-white border border-gray-200 rounded-3xl p-4 sm:p-5 flex flex-col shadow-sm min-w-0 overflow-hidden">
 
           {/* Panel Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <div className="min-w-0">
               <h4 className="font-bold text-gray-900 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-emerald-600" /> Split Documents Workspace
+                <Layers className="w-4 h-4 text-emerald-600 flex-shrink-0" /> Split Documents Workspace
               </h4>
-              <p className="text-[11px] text-gray-500">Drag to reorder PDF and Image chunks for custom merge sequence.</p>
+              <p className="text-[11px] text-gray-500 truncate">Drag to reorder PDF and Image chunks for custom merge sequence.</p>
             </div>
-            <span className="text-xs font-extrabold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
-              {chunks.length} Chunks
-            </span>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {chunks.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setChunks([])}
+                  className="text-xs text-red-500 hover:text-red-600 font-bold px-2 py-1 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  Clear All
+                </button>
+              )}
+              <span className="text-xs font-extrabold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
+                {chunks.length} Chunks
+              </span>
+            </div>
           </div>
 
           {/* Bulk Check All Control Bar */}
@@ -2155,8 +2167,11 @@ export default function PdfSplitWizard() {
 
       </div>
 
+      {/* Spacer for mobile fixed footer */}
+      <div className="h-28 md:hidden flex-shrink-0" />
+
       {/* --- Bottom Sticky Summary & Action Bar --- */}
-      <div className="bg-slate-900 text-white rounded-3xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-800">
+      <div className="fixed md:static bottom-0 left-0 right-0 z-20 bg-slate-900 text-white rounded-t-3xl md:rounded-3xl p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] md:shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border-t md:border border-slate-800">
         <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-gray-300">
           <div className="flex items-center gap-1.5">
             <FileText className="w-4 h-4 text-blue-400" />

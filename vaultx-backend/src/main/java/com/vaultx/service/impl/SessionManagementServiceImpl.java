@@ -72,6 +72,12 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 
     @Override
     @Transactional(readOnly = true)
+    public boolean isSessionActive(String refreshToken) {
+        return sessionRepository.findByRefreshToken(refreshToken).isPresent();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<SessionDto> getUserSessions(UUID userId, String currentRefreshToken) {
         return sessionRepository.findByUserId(userId).stream()
                 .map(session -> mapToDto(session, currentRefreshToken))

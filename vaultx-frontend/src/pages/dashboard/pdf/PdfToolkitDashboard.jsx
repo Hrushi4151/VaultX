@@ -134,8 +134,8 @@ export default function PdfToolkitDashboard() {
     <div className="h-full flex flex-col pb-8 space-y-8">
       
       {/* --- Top Header with Right-Aligned Temporary Storage Button --- */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="w-full sm:w-auto">
           <h1 className="page-title">PDF Toolkit</h1>
           <p className="page-subtitle mt-1">
             Professional PDF processing engine. Merge, compress, split, and secure your documents.
@@ -163,8 +163,8 @@ export default function PdfToolkitDashboard() {
       </div>
 
       {/* --- Hero Banner --- */}
-      <div className="bg-gradient-to-r from-primary/90 to-primary-dark rounded-3xl p-8 text-white flex items-center justify-between shadow-lg relative overflow-hidden">
-        <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+      <div className="bg-gradient-to-r from-primary/90 to-primary-dark rounded-3xl p-6 sm:p-8 text-white flex items-center justify-between shadow-lg relative overflow-hidden">
+        <div className="hidden sm:block absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
           <FileOutput className="w-64 h-64" />
         </div>
         <div className="max-w-xl relative z-10">
@@ -174,9 +174,9 @@ export default function PdfToolkitDashboard() {
           </p>
           <button 
             onClick={() => navigate('/dashboard/pdf-toolkit/export')}
-            className="px-6 py-3 bg-white text-primary font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
+            className="px-6 py-3 bg-white text-primary font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto"
           >
-            <FilePlus className="w-5 h-5" />
+            <FilePlus className="w-5 h-5 flex-shrink-0" />
             Start PDF Export Wizard
           </button>
         </div>
@@ -205,28 +205,28 @@ export default function PdfToolkitDashboard() {
       {/* --- TEMPORARY STORAGE MANAGER MODAL --- */}
       {tempStorageModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl p-4 sm:p-6 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-100 pb-3 gap-3 sm:gap-0">
+              <div className="flex items-start sm:items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold flex-shrink-0 mt-1 sm:mt-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                    7-Day Temporary Storage Manager
+                  <h3 className="font-bold text-gray-900 text-lg flex items-center flex-wrap gap-2">
+                    7-Day Temporary Storage
                     <span className="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">
-                      {tempFiles.length} Staged File(s)
+                      {tempFiles.length} File(s)
                     </span>
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Staged PDFs automatically delete after 7 days. Download or manage your files below.
+                    Staged PDFs automatically delete after 7 days.
                   </p>
                 </div>
               </div>
 
               <button 
                 onClick={() => setTempStorageModalOpen(false)} 
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors self-end sm:self-center absolute top-4 sm:top-auto sm:relative right-4 sm:right-auto"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -246,11 +246,11 @@ export default function PdfToolkitDashboard() {
                   {tempFiles.map(file => (
                     <div 
                       key={file.id} 
-                      className="bg-slate-50 border border-purple-100 rounded-2xl p-4 flex items-center justify-between gap-4 hover:border-purple-300 transition-all shadow-xs"
+                      className="bg-slate-50 border border-purple-100 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-purple-300 transition-all shadow-xs"
                     >
                       <div 
                         onClick={() => openPreviewForTempFile(file)}
-                        className="flex items-center gap-3 min-w-0 cursor-pointer group flex-1"
+                        className="flex items-center gap-3 min-w-0 cursor-pointer group w-full sm:w-auto flex-1"
                         title="Click to preview file"
                       >
                         <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 font-bold group-hover:bg-purple-200 transition-colors">
@@ -269,7 +269,7 @@ export default function PdfToolkitDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
                         <button
                           type="button"
                           onClick={() => openPreviewForTempFile(file)}
@@ -323,26 +323,26 @@ export default function PdfToolkitDashboard() {
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95">
             {/* Modal Header */}
-            <div className="p-4 bg-slate-950 flex items-center justify-between border-b border-slate-800 px-6">
-              <div className="flex items-center gap-3 min-w-0">
+            <div className="p-4 bg-slate-950 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800 px-4 sm:px-6 gap-3 sm:gap-0">
+              <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto pr-8 sm:pr-0">
                 <Eye className="w-5 h-5 text-purple-400 flex-shrink-0" />
                 <h3 className="font-bold text-base text-white truncate">
                   {previewDocModal.title}
                 </h3>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 self-end sm:self-auto flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => handleDownloadTempFile(previewDocModal.file)}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all"
                 >
-                  <Download className="w-4 h-4" /> Download File
+                  <Download className="w-4 h-4 flex-shrink-0" /> Download File
                 </button>
                 <button 
                   type="button"
                   onClick={() => setPreviewDocModal(prev => ({ ...prev, isOpen: false }))}
-                  className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+                  className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors absolute top-3 sm:top-auto sm:relative right-3 sm:right-auto"
                 >
                   <X className="w-5 h-5" />
                 </button>

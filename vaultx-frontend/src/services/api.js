@@ -18,8 +18,12 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(TOKEN_KEY);
+    const refreshToken = localStorage.getItem('vaultx_refresh_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (refreshToken) {
+      config.headers['X-Refresh-Token'] = refreshToken;
     }
     return config;
   },
@@ -93,11 +97,8 @@ api.interceptors.response.use(
       }
     }
     
-    // Other errors (not 401)
-    if (error.response?.status === 401 && originalRequest.url.includes('/auth/')) {
-        // If it's 401 on login itself, just pass it through
-    } else if (error.response?.status === 401) {
-        // Handle other 401 cases where refresh token is missing or failed (fallback)
+    // Handle 403 Forbidden (expired or invalidated token)
+    if ((error.response?.status === 403 || error.response?.status === 401) && !originalRequest.url.includes('/auth/')) {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem('vaultx_user');
         localStorage.removeItem('vaultx_refresh_token');

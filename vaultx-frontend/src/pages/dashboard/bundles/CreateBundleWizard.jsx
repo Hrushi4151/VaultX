@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ChevronRight, ChevronLeft, Check, FileText, Search, Settings, File, Layout, X, Image as ImageIcon, Clock, Eye } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, FileText, Search, Settings, File, Layout, X, Image as ImageIcon, Clock, Eye, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import bundleService from '../../../services/bundleService';
 import documentService from '../../../services/documentService';
@@ -146,20 +146,7 @@ export default function CreateBundleWizard() {
     }
   };
 
-  // Drag and drop handlers for Selection step (Kanban style)
-  const onDragEndSelection = (result) => {
-    const { source, destination } = result;
-    if (!destination) return;
 
-    if (source.droppableId === 'vault' && destination.droppableId === 'selected') {
-      const doc = vaultDocs.find(d => d.id === result.draggableId);
-      if (doc && !selectedDocs.some(sd => sd.id === doc.id)) {
-        setSelectedDocs([...selectedDocs, doc]);
-      }
-    } else if (source.droppableId === 'selected' && destination.droppableId === 'vault') {
-      setSelectedDocs(selectedDocs.filter(d => d.id !== result.draggableId));
-    }
-  };
 
   // Drag and drop handlers for Arrange step (Vertical List)
   const onDragEndArrange = (result) => {
@@ -173,22 +160,22 @@ export default function CreateBundleWizard() {
   // --- Step Renders ---
   
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-between mb-8 px-4 sm:px-12 relative">
-      <div className="absolute top-1/2 left-12 right-12 h-0.5 bg-gray-100 -z-10 -translate-y-1/2" />
+    <div className="flex items-center justify-between mb-4 sm:mb-8 px-4 sm:px-12 relative w-full overflow-hidden">
+      <div className="absolute top-1/2 left-8 right-8 sm:left-12 sm:right-12 h-0.5 bg-gray-100 -z-10 -translate-y-1/2" />
       <div 
-        className="absolute top-1/2 left-12 h-0.5 bg-primary -z-10 -translate-y-1/2 transition-all duration-300"
+        className="absolute top-1/2 left-8 sm:left-12 h-0.5 bg-primary -z-10 -translate-y-1/2 transition-all duration-300"
         style={{ width: `calc(${(currentStep / (STEPS.length - 1)) * 100}% - 3rem)` }}
       />
       {STEPS.map((step, idx) => (
-        <div key={step} className="flex flex-col items-center gap-2">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors border-2
+        <div key={step} className="flex flex-col items-center gap-1 sm:gap-2">
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-colors border-2 z-10
             ${currentStep > idx ? 'bg-primary border-primary text-white' : 
               currentStep === idx ? 'bg-white border-primary text-primary shadow-[0_0_0_4px_rgba(37,99,235,0.1)]' : 
               'bg-white border-gray-200 text-gray-400'}`}
           >
-            {currentStep > idx ? <Check className="w-5 h-5" /> : idx + 1}
+            {currentStep > idx ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : idx + 1}
           </div>
-          <span className={`text-xs font-medium hidden sm:block ${currentStep >= idx ? 'text-gray-800' : 'text-gray-400'}`}>
+          <span className={`text-[10px] sm:text-xs font-medium hidden md:block ${currentStep >= idx ? 'text-gray-800' : 'text-gray-400'}`}>
             {step}
           </span>
         </div>
@@ -246,128 +233,101 @@ export default function CreateBundleWizard() {
 
   const renderChooseStep = () => {
     const availableDocs = vaultDocs.filter(d => 
-      !selectedDocs.some(sd => sd.id === d.id) &&
       d.displayName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
-      <div className="h-[600px] flex flex-col">
-        <DragDropContext onDragEnd={onDragEndSelection}>
-          <div className="grid md:grid-cols-2 gap-6 h-full">
-            
-            {/* Vault Area */}
-            <div className="bg-gray-50 rounded-2xl border border-gray-100 p-4 flex flex-col h-full">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-gray-800">Your Vault</h3>
-                <button
-                  type="button"
-                  onClick={handleOpenTempModal}
-                  className="px-3 py-1.5 bg-purple-600 text-white font-bold text-xs rounded-xl hover:bg-purple-700 transition-all flex items-center gap-1 shadow-xs"
-                >
-                  <Clock className="w-3.5 h-3.5" /> Pick Temp File (7D)
-                </button>
-              </div>
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Search documents..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none"
-                />
-              </div>
-              
-              <Droppable droppableId="vault" isDropDisabled={true}>
-                {(provided) => (
-                  <div 
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex-1 overflow-y-auto space-y-2 pr-2"
-                  >
-                    {availableDocs.map((doc, index) => (
-                      <Draggable key={doc.id} draggableId={doc.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`flex items-center gap-3 p-3 bg-white border rounded-xl shadow-sm cursor-grab
-                              ${snapshot.isDragging ? 'border-primary ring-2 ring-primary/20 scale-105 shadow-lg' : 'border-gray-100 hover:border-primary/30'}`}
-                          >
-                            {getFileIcon(doc.mimeType)}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-800 truncate">{doc.displayName}</p>
-                              <p className="text-xs text-gray-400">{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</p>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                    {availableDocs.length === 0 && (
-                      <div className="text-center p-4 text-gray-400 text-sm">No available documents found.</div>
-                    )}
-                  </div>
-                )}
-              </Droppable>
+      <div className="flex flex-col h-full">
+        {/* Header with Search and Stats */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 className="font-bold text-gray-800">Select Documents</h3>
+            <p className="text-sm text-gray-500 font-medium">
+              <span className="text-primary font-bold">{selectedDocs.length}</span> selected for bundle
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search vault..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-56 pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all"
+              />
             </div>
+            <button
+              type="button"
+              onClick={handleOpenTempModal}
+              className="px-3 py-2 bg-purple-600 text-white font-bold text-sm rounded-lg hover:bg-purple-700 transition-all flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap"
+            >
+              <Clock className="w-4 h-4" /> Pick Temp File
+            </button>
+          </div>
+        </div>
 
-            {/* Selected Area */}
-            <div className="bg-primary/5 rounded-2xl border border-primary/20 p-4 flex flex-col h-full">
-              <h3 className="font-bold text-primary mb-3">Selected for Bundle ({selectedDocs.length})</h3>
-              <p className="text-sm text-primary/70 mb-4">Drag documents here to add them to your bundle.</p>
-              
-              <Droppable droppableId="selected">
-                {(provided, snapshot) => (
-                  <div 
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className={`flex-1 overflow-y-auto space-y-2 pr-2 rounded-xl transition-colors
-                      ${snapshot.isDraggingOver ? 'bg-primary/10' : ''}`}
-                  >
-                    {selectedDocs.map((doc, index) => (
-                      <Draggable key={doc.id} draggableId={doc.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="flex items-center gap-3 p-3 bg-white border border-primary/20 rounded-xl shadow-sm cursor-grab"
-                          >
-                            {getFileIcon(doc.mimeType)}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-800 truncate">{doc.displayName}</p>
-                            </div>
-                            <button 
-                              onClick={() => setSelectedDocs(selectedDocs.filter(d => d.id !== doc.id))}
-                              className="p-1 text-gray-400 hover:text-danger rounded"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                    {selectedDocs.length === 0 && !snapshot.isDraggingOver && (
-                      <div className="h-full border-2 border-dashed border-primary/30 rounded-xl flex items-center justify-center text-primary/50 text-sm">
-                        Drop documents here
+        {/* Document List */}
+        <div className="flex-1 bg-gray-50/50 rounded-2xl border border-gray-100 p-2 sm:p-4 overflow-y-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            {availableDocs.map((doc) => {
+              const isSelected = selectedDocs.some(sd => sd.id === doc.id);
+              return (
+                <div 
+                  key={doc.id}
+                  onClick={() => {
+                    if (isSelected) setSelectedDocs(selectedDocs.filter(d => d.id !== doc.id));
+                    else setSelectedDocs([...selectedDocs, doc]);
+                  }}
+                  className={`flex items-center gap-3 p-3 sm:p-4 rounded-xl border transition-all cursor-pointer
+                    ${isSelected ? 'bg-primary/5 border-primary ring-1 ring-primary/20 shadow-md transform scale-[1.02]' : 'bg-white border-gray-200 hover:border-primary/40 shadow-sm hover:shadow-md'}`}
+                >
+                  <div className={`p-2 rounded-lg flex-shrink-0 ${isSelected ? 'bg-primary/10' : 'bg-gray-100'}`}>
+                    {getFileIcon(doc.mimeType)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-semibold truncate ${isSelected ? 'text-primary-dark' : 'text-gray-800'}`}>
+                      {doc.displayName}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 truncate">
+                      {(doc.fileSize / 1024 / 1024).toFixed(2)} MB • {doc.mimeType?.split('/')[1]?.toUpperCase() || 'FILE'}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 ml-1">
+                    {isSelected ? (
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm">
+                        <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                       </div>
                     )}
                   </div>
-                )}
-              </Droppable>
-            </div>
-
+                </div>
+              );
+            })}
           </div>
-        </DragDropContext>
+          
+          {availableDocs.length === 0 && (
+            <div className="h-full flex flex-col items-center justify-center text-gray-400 p-8">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <Search className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-1">No matching documents found</p>
+              <p className="text-xs text-center max-w-xs text-gray-400">
+                Adjust your search or click "Pick Temp File" to add a new document to this bundle.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
   const renderArrangeStep = () => (
-    <div className="max-w-2xl mx-auto h-[600px] flex flex-col">
+    <div className="max-w-2xl mx-auto h-full flex flex-col w-full">
       <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl mb-6 text-sm flex gap-3">
         <Layout className="w-5 h-5 flex-shrink-0" />
         <p>Drag and drop items to reorder them. This order will be preserved in the generated PDF and Table of Contents.</p>
@@ -535,7 +495,7 @@ export default function CreateBundleWizard() {
   };
 
   return (
-    <div className="h-full flex flex-col pb-8">
+    <div className="h-full flex flex-col pb-8 w-full max-w-full overflow-x-hidden">
       
       <div className="flex items-center gap-4 mb-6">
         <button onClick={() => navigate('/dashboard/bundles')} className="p-2 bg-white rounded-lg border border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors shadow-sm">
@@ -553,15 +513,18 @@ export default function CreateBundleWizard() {
           {renderStepIndicator()}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50/30">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-gray-50/30 flex flex-col relative">
           {currentStep === 0 && renderDetailsStep()}
           {currentStep === 1 && renderChooseStep()}
           {currentStep === 2 && renderArrangeStep()}
           {currentStep === 3 && renderSettingsStep()}
           {currentStep === 4 && renderReviewStep()}
+          
+          {/* Spacer to prevent content from hiding behind fixed footer on mobile */}
+          <div className="h-20 md:hidden flex-shrink-0" />
         </div>
 
-        <div className="p-6 bg-white border-t border-gray-100 flex items-center justify-between">
+        <div className="fixed md:static bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t border-gray-200 md:border-gray-100 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.08)] md:shadow-none z-20">
           <button 
             onClick={handleBack}
             disabled={currentStep === 0 || isSubmitting}

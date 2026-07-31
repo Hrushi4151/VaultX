@@ -652,29 +652,30 @@ export default function PdfWatermarkWizard() {
   };
 
   return (
-    <div className="h-full flex flex-col pb-6 space-y-4">
+    <div className="h-full flex flex-col pb-6 space-y-4 w-full max-w-full overflow-x-hidden">
 
       {/* --- Top Header Toolbar --- */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-3xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 min-w-0 w-full sm:w-auto">
           <button 
             onClick={() => navigate('/dashboard/pdf-toolkit')}
-            className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
+            className="p-2 flex-shrink-0 mt-1 sm:mt-0 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
             title="Back to PDF Toolkit"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Type className="w-5 h-5 text-purple-600" /> Multi-Overlay Watermark & Stamp Studio
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-start sm:items-center gap-2 break-words">
+              <Type className="w-5 h-5 text-purple-600 flex-shrink-0 mt-1 sm:mt-0" /> 
+              <span className="leading-tight">Multi-Overlay Watermark & Stamp Studio</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 mt-1">
               Combine Text Watermark, Image Logo, and Digital Signature simultaneously with independent positions!
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-center">
+        <div className="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
           <button
             type="button"
             onClick={handleSaveToTempStorage}
@@ -700,7 +701,7 @@ export default function PdfWatermarkWizard() {
       <div className="flex-1 grid lg:grid-cols-12 gap-6 min-h-[580px]">
 
         {/* ── LEFT COLUMN: Independent Multi-Overlay Controls & Placement Sheet (6 cols) ── */}
-        <div className="lg:col-span-6 bg-white border border-gray-200 rounded-3xl p-5 flex flex-col space-y-5 shadow-sm overflow-y-auto max-h-[740px]">
+        <div className="lg:col-span-6 bg-white border border-gray-200 rounded-3xl p-4 sm:p-5 flex flex-col space-y-5 shadow-sm min-w-0 overflow-y-auto max-h-[740px]">
 
           {/* 1. Document Source Badge */}
           {sourceDoc ? (
@@ -1203,7 +1204,7 @@ export default function PdfWatermarkWizard() {
         </div>
 
         {/* ── RIGHT COLUMN: Live Watermarked PDF Preview (6 cols) ── */}
-        <div className="lg:col-span-6 bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-xl border border-slate-800">
+        <div className="lg:col-span-6 bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-xl border border-slate-800 min-h-[500px] lg:min-h-0 min-w-0">
           <div className="p-4 bg-slate-950 text-white flex items-center justify-between border-b border-white/10 px-6">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-purple-400" />

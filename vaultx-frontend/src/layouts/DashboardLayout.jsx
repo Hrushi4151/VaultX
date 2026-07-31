@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
+import ChatWidget from '../components/chat/ChatWidget';
+import useAutoLock from '../hooks/useAutoLock';
+import PrivacyLockOverlay from '../components/auth/PrivacyLockOverlay';
 
 const pageTitles = {
   '/dashboard':         'Dashboard',
@@ -17,9 +20,12 @@ export default function DashboardLayout() {
   const location = useLocation();
 
   const pageTitle = pageTitles[location.pathname] || 'Dashboard';
+  
+  // Vault Privacy Auto-Lock Hook (Dynamic timeout from Settings)
+  const { isLocked, unlockVault } = useAutoLock();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background relative">
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
@@ -38,6 +44,11 @@ export default function DashboardLayout() {
           </div>
         </main>
       </div>
+
+      <ChatWidget />
+      
+      {/* Auto-Lock Overlay */}
+      {isLocked && <PrivacyLockOverlay onUnlock={unlockVault} />}
     </div>
   );
 }

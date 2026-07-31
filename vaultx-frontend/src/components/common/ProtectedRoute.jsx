@@ -25,5 +25,14 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.some(r => ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'].includes(r.name));
+
+  if (isAdmin) {
+    if (location.pathname.startsWith('/dashboard')) {
+      return <Navigate to="/admin" replace />;
+    }
+  }
+
   return children;
 }

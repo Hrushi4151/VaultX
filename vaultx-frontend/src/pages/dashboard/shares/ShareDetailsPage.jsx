@@ -90,12 +90,12 @@ export default function ShareDetailsPage() {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="page-title flex items-center gap-3">
-              {share.name}
+            <h1 className="page-title flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="break-all">{share.name}</span>
               {share.active ? (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-success/10 text-success text-xs font-bold">Active</span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-success/10 text-success text-xs font-bold whitespace-nowrap">Active</span>
               ) : (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">Revoked</span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs font-bold whitespace-nowrap">Revoked</span>
               )}
             </h1>
             <p className="page-subtitle mt-1 font-mono text-[10px] sm:text-xs truncate max-w-[250px] sm:max-w-md">{window.location.origin}/share/{share.token}</p>

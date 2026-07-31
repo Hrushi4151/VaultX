@@ -350,29 +350,30 @@ export default function PdfProtectWizard() {
   };
 
   return (
-    <div className="h-full flex flex-col pb-6 space-y-4">
+    <div className="h-full flex flex-col pb-6 space-y-4 w-full max-w-full overflow-x-hidden">
 
       {/* --- Top Header Toolbar --- */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-3xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 min-w-0 w-full sm:w-auto">
           <button 
             onClick={() => navigate('/dashboard/pdf-toolkit')}
-            className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
+            className="p-2 flex-shrink-0 mt-1 sm:mt-0 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors"
             title="Back to PDF Toolkit"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Key className="w-5 h-5 text-amber-500" /> PDF Password Protection & Encryption
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-start sm:items-center gap-2 break-words">
+              <Key className="w-5 h-5 text-amber-500 flex-shrink-0 mt-1 sm:mt-0" /> 
+              <span className="leading-tight">PDF Password Protection & Encryption</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 mt-1">
               Encrypt documents with passwords, restrict copying & printing, and enforce 256-bit AES security.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-center">
+        <div className="flex items-center gap-2 self-end sm:self-center flex-shrink-0">
 
           <button
             type="button"
@@ -399,7 +400,7 @@ export default function PdfProtectWizard() {
       <div className="flex-1 grid lg:grid-cols-12 gap-6 min-h-[580px]">
 
         {/* ── LEFT COLUMN: Encryption & Permissions Controls (6 cols) ── */}
-        <div className="lg:col-span-6 bg-white border border-gray-200 rounded-3xl p-5 flex flex-col space-y-5 shadow-sm overflow-y-auto max-h-[740px]">
+        <div className="lg:col-span-6 bg-white border border-gray-200 rounded-3xl p-4 sm:p-5 flex flex-col space-y-5 shadow-sm min-w-0 overflow-y-auto max-h-[740px]">
 
           {/* 1. Document Source Badge */}
           {sourceDoc ? (

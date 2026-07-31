@@ -30,4 +30,8 @@ public class RegisterWithOtpRequest {
 
     @NotBlank(message = "OTP code is required")
     private String otp;
+
+    private String walletPassword;
+
+    private String faceData;
 }

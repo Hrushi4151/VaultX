@@ -11,6 +11,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.InputStream;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/pdf")
 @RequiredArgsConstructor
 @Tag(name = "PDF Toolkit", description = "Endpoints for professional PDF manipulation and exporting")
+@PreAuthorize("hasRole('USER')")
 public class PdfController {
 
     private final PdfExportService pdfExportService;

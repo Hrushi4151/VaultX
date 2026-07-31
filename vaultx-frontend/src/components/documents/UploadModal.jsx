@@ -13,111 +13,7 @@ const ALLOWED_TYPES = [
 ];
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-const analyzeFileClientSide = (file) => {
-  const name = (file.name || '').toLowerCase();
-  const ext = name.split('.').pop() || 'pdf';
 
-  let suggestedName = `Organized_Document.${ext}`;
-  let suggestedCategory = 'Personal';
-  let suggestedType = 'General Document';
-  let primaryCollection = 'Personal Vault';
-  let collectionOptions = ['Personal Vault', 'Important Documents'];
-  let suggestedTags = ['#document', '#vault', '#verified'];
-
-  // 1. Driving Licence / Learner's Licence / RTO Application
-  if (name.includes('licence') || name.includes('license') || name.includes('driving') || name.includes('dl') || name.includes('rto') || name.includes('learner') || name.includes('form')) {
-    suggestedName = `Driving_Licence_Document.${ext}`;
-    suggestedCategory = 'Identity';
-    suggestedType = "Driving Licence / Learner's Permit";
-    primaryCollection = 'Driving Licences & Vehicle Papers';
-    collectionOptions = ['Driving Licences & Vehicle Papers', 'Government IDs & Passports', 'Vehicle & Transport Records', 'Personal Vault'];
-    suggestedTags = ['#drivinglicence', '#rto', '#identity', '#vehicle'];
-  }
-  // 2. Aadhaar Card
-  else if (name.includes('aadhaar') || name.includes('uidai') || name.includes('aadhar')) {
-    suggestedName = `Aadhaar_Government_ID.${ext}`;
-    suggestedCategory = 'Identity';
-    suggestedType = 'Aadhaar Government ID';
-    primaryCollection = 'Government IDs & Passports';
-    collectionOptions = ['Government IDs & Passports', 'Identity Proofs', 'Personal Vault'];
-    suggestedTags = ['#aadhaar', '#identity', '#government'];
-  }
-  // 3. PAN Card
-  else if (name.includes('pan')) {
-    suggestedName = `PAN_Card_Tax_ID.${ext}`;
-    suggestedCategory = 'Identity';
-    suggestedType = 'PAN Card Tax Identity';
-    primaryCollection = 'Government IDs & Passports';
-    collectionOptions = ['Government IDs & Passports', 'Tax & Accounting Records', 'Personal Vault'];
-    suggestedTags = ['#pan', '#tax', '#identity'];
-  }
-  // 4. Passport
-  else if (name.includes('passport')) {
-    suggestedName = `Official_Passport_Doc.${ext}`;
-    suggestedCategory = 'Identity';
-    suggestedType = 'Official Passport';
-    primaryCollection = 'Government IDs & Passports';
-    collectionOptions = ['Government IDs & Passports', 'Travel Documents', 'Personal Vault'];
-    suggestedTags = ['#passport', '#identity', '#travel'];
-  }
-  // 5. Resume / CV
-  else if (name.includes('resume') || name.includes('cv') || name.includes('curriculum') || name.includes('biodata')) {
-    suggestedName = `Resume_Professional_CV.${ext}`;
-    suggestedCategory = 'Employment';
-    suggestedType = 'Resume / Professional CV';
-    primaryCollection = 'Resumes & CVs';
-    collectionOptions = ['Resumes & CVs', 'Career & Professional', 'Employment Documents', 'Personal Vault'];
-    suggestedTags = ['#resume', '#career', '#professional', '#cv'];
-  }
-  // 6. Marksheet / Transcript / Degree / Diploma
-  else if (name.includes('marksheet') || name.includes('transcript') || name.includes('degree') || name.includes('diploma') || name.includes('certificate') || name.includes('grade')) {
-    suggestedName = `Academic_Marksheet_Transcript.${ext}`;
-    suggestedCategory = 'Education';
-    suggestedType = 'Academic Marksheet / Transcript';
-    primaryCollection = 'Education & Marksheets';
-    collectionOptions = ['Education & Marksheets', 'Academic Transcripts', 'Student Certificates', 'Personal Vault'];
-    suggestedTags = ['#marksheet', '#education', '#transcript', '#verified'];
-  }
-  // 7. Signature / Identity Image
-  else if (name.includes('whatsapp') || name.includes('img') || name.includes('image') || name.includes('scan') || name.includes('signature') || name.includes('photo')) {
-    suggestedName = `Signature_Identity_Proof.${ext}`;
-    suggestedCategory = 'Identity';
-    suggestedType = 'Handwritten Signature / Identity Proof';
-    primaryCollection = 'Signatures & Identity Proofs';
-    collectionOptions = ['Signatures & Identity Proofs', 'Government IDs & Passports', 'Personal Vault'];
-    suggestedTags = ['#signature', '#identity', '#verified'];
-  }
-  // 8. Invoice / Bill / Receipt
-  else if (name.includes('invoice') || name.includes('receipt') || name.includes('bill') || name.includes('tax')) {
-    suggestedName = `Tax_Invoice_Record.${ext}`;
-    suggestedCategory = 'Finance';
-    suggestedType = 'Tax Invoice / Expense Receipt';
-    primaryCollection = 'Financial Bills & Receipts';
-    collectionOptions = ['Financial Bills & Receipts', 'Tax & Accounting Records', 'Personal Vault'];
-    suggestedTags = ['#invoice', '#finance', '#tax', '#receipt'];
-  }
-  // 9. Medical / Health Report
-  else if (name.includes('medical') || name.includes('report') || name.includes('health') || name.includes('hospital') || name.includes('prescription')) {
-    suggestedName = `Medical_Health_Report.${ext}`;
-    suggestedCategory = 'Health';
-    suggestedType = 'Medical Report / Prescription';
-    primaryCollection = 'Health & Medical Records';
-    collectionOptions = ['Health & Medical Records', 'Personal Vault'];
-    suggestedTags = ['#medical', '#health', '#report'];
-  } else {
-    suggestedName = `Official_Vault_Document.${ext}`;
-  }
-
-  return {
-    suggestedName,
-    suggestedCategory,
-    suggestedType,
-    suggestedCollectionName: primaryCollection,
-    suggestedCollectionNames: collectionOptions,
-    suggestedTags,
-    confidenceScore: 0.98
-  };
-};
 
 export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
   const [dragActive, setDragActive] = useState(false);
@@ -138,14 +34,13 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
 
   const handleFiles = (newFiles) => {
     const fileObjects = Array.from(newFiles).map(file => {
-      const aiAnalysis = analyzeFileClientSide(file);
       return {
         id: Math.random().toString(36).substring(7),
         file,
         progress: 0,
         status: 'pending', // pending, uploading, success, error
         error: validateFile(file),
-        aiAnalysis,
+        aiAnalysis: null,
         customName: file.name,
         customCategory: '',
         customCollection: '',
@@ -182,37 +77,73 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
     setFiles(prev => prev.filter(f => f.id !== id));
   };
 
-  const applyAiToAllFiles = () => {
-    setFiles(prev => prev.map(f => {
-      if (f.error) return f;
-      const ai = f.aiAnalysis || analyzeFileClientSide(f.file);
-      return {
-        ...f,
-        customName: ai.suggestedName,
-        customCategory: ai.suggestedCategory,
-        customCollection: ai.suggestedCollectionName,
-        customTags: ai.suggestedTags,
-        aiApplied: true
-      };
-    }));
-    toast.success('✨ Applied AI suggestions to all selected documents!');
+  const applyAiToAllFiles = async () => {
+    toast.loading('Analyzing documents with AI...', { id: 'ai-analyze-all' });
+    const updatedFiles = [...files];
+    for (let i = 0; i < updatedFiles.length; i++) {
+      const f = updatedFiles[i];
+      if (f.error || f.aiApplied) continue;
+      
+      try {
+        const res = await aiService.analyzePreview(f.file);
+        const ai = res.data;
+        updatedFiles[i] = {
+          ...f,
+          aiAnalysis: ai,
+          customName: ai.suggestedName,
+          customCategory: ai.suggestedCategory,
+          customCollection: ai.suggestedCollectionName || ai.primaryCollection,
+          customTags: ai.suggestedTags,
+          aiApplied: true
+        };
+      } catch (err) {
+        console.error('Failed to analyze file:', f.file.name, err);
+      }
+    }
+    setFiles(updatedFiles);
+    toast.success('✨ Applied AI suggestions to all selected documents!', { id: 'ai-analyze-all' });
   };
 
-  const applyAiToFile = (fileId) => {
-    setFiles(prev => prev.map(f => {
-      if (f.id !== fileId) return f;
-      const ai = f.aiAnalysis || analyzeFileClientSide(f.file);
-      return {
-        ...f,
-        customName: ai.suggestedName,
-        customCategory: ai.suggestedCategory,
-        customCollection: ai.suggestedCollectionName,
-        customTags: ai.suggestedTags,
-        aiApplied: true
-      };
-    }));
-    toast.success('✨ AI suggestions applied to file!');
-    setAiModalFileId(null);
+  const applyAiToFile = async (fileId) => {
+    const fileObj = files.find(f => f.id === fileId);
+    if (!fileObj) return;
+
+    toast.loading('Analyzing document with AI...', { id: 'ai-analyze-single' });
+    try {
+      const res = await aiService.analyzePreview(fileObj.file);
+      const ai = res.data;
+      setFiles(prev => prev.map(f => {
+        if (f.id !== fileId) return f;
+        return {
+          ...f,
+          aiAnalysis: ai,
+          customName: ai.suggestedName,
+          customCategory: ai.suggestedCategory,
+          customCollection: ai.suggestedCollectionName || ai.primaryCollection,
+          customTags: ai.suggestedTags,
+          aiApplied: true
+        };
+      }));
+      toast.success('✨ AI suggestions applied to file!', { id: 'ai-analyze-single' });
+    } catch (err) {
+      console.error('Failed to analyze file', err);
+      toast.error('Failed to generate AI suggestions', { id: 'ai-analyze-single' });
+      throw err; // throw so handleOpenAiModal can catch it
+    }
+  };
+
+  const handleOpenAiModal = async (fileId) => {
+    const fileObj = files.find(f => f.id === fileId);
+    if (!fileObj) return;
+    
+    if (!fileObj.aiAnalysis) {
+      try {
+        await applyAiToFile(fileId);
+      } catch (err) {
+        return; // don't open modal if analysis failed
+      }
+    }
+    setAiModalFileId(fileId);
   };
 
   const updateFileAiField = (fileId, field, value) => {
@@ -247,7 +178,8 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
               suggestedName: fileObj.customName || fileObj.file.name,
               categoryName: fileObj.customCategory || fileObj.aiAnalysis?.suggestedCategory,
               collectionName: fileObj.customCollection || fileObj.aiAnalysis?.suggestedCollectionName,
-              tags: (fileObj.customTags && fileObj.customTags.length > 0) ? fileObj.customTags : fileObj.aiAnalysis?.suggestedTags
+              tags: (fileObj.customTags && fileObj.customTags.length > 0) ? fileObj.customTags : fileObj.aiAnalysis?.suggestedTags,
+              ocrText: fileObj.aiAnalysis?.ocrText
             });
           } catch (aiErr) {
             console.warn('AI suggestions auto-apply after upload failed:', aiErr);
@@ -284,7 +216,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
   };
 
   const activeAiFileObj = files.find(f => f.id === aiModalFileId);
-  const activeAi = activeAiFileObj?.aiAnalysis || (activeAiFileObj ? analyzeFileClientSide(activeAiFileObj.file) : null);
+  const activeAi = activeAiFileObj?.aiAnalysis || null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -367,7 +299,10 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                           {/* Dedicated AI Suggestion Icon Button per file */}
                           {f.status === 'pending' && (
                             <button
-                              onClick={() => setAiModalFileId(f.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenAiModal(f.id);
+                              }}
                               className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1 transition-all ${
                                 f.aiApplied 
                                   ? 'bg-purple-100 text-purple-800 border border-purple-300 shadow-xs' 
@@ -630,28 +565,20 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      const freshAi = analyzeFileClientSide(activeAiFileObj.file);
-                      setFiles(prev => prev.map(f => f.id === activeAiFileObj.id ? { 
-                        ...f, 
-                        aiAnalysis: freshAi,
-                        customName: freshAi.suggestedName,
-                        customCategory: freshAi.suggestedCategory,
-                        customCollection: freshAi.suggestedCollectionName,
-                        customTags: freshAi.suggestedTags
-                      } : f));
-                      toast.success('✨ VaultX AI re-analyzed document text & properties!');
-                    }}
+                    onClick={() => applyAiToFile(activeAiFileObj.id)}
                     className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
                   >
                     <RotateCw className="w-3.5 h-3.5" /> Reprocess with AI
                   </button>
 
                   <button
-                    onClick={() => applyAiToFile(activeAiFileObj.id)}
+                    onClick={() => {
+                      updateFileAiField(activeAiFileObj.id, 'aiApplied', true);
+                      setAiModalFileId(null);
+                    }}
                     className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all transform hover:scale-[1.02]"
                   >
-                    <Sparkles className="w-4 h-4 text-yellow-300" /> Apply All AI Suggestions
+                    <Check className="w-4 h-4" /> Save Changes
                   </button>
                 </div>
               </div>

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -82,13 +83,50 @@ public class UserController {
     @Operation(summary = "Get active sessions")
     public ResponseEntity<ApiResponse<java.util.List<com.vaultx.dto.user.SessionDto>>> getSessions(jakarta.servlet.http.HttpServletRequest request) {
         log.debug("GET /users/sessions");
-        UUID currentUserId = userService.getCurrentUser().getId();
+        UserDto currentUser = userService.getCurrentUser();
+        UUID currentUserId = currentUser.getId();
         
-        // Extract current refresh token from request if present (for marking current session)
-        String currentRefreshToken = null; 
+        String refreshTokenHeader = request.getHeader("X-Refresh-Token");
+        java.util.List<com.vaultx.dto.user.SessionDto> sessions = sessionManagementService.getUserSessions(currentUserId, refreshTokenHeader);
         
-        return ResponseEntity.ok(ApiResponse.success("Sessions retrieved", 
-                sessionManagementService.getUserSessions(currentUserId, currentRefreshToken)));
+        boolean currentDeviceTracked = false;
+        if (refreshTokenHeader != null) {
+            currentDeviceTracked = sessions.stream().anyMatch(s -> refreshTokenHeader.equals(s.getId().toString()) || s.isCurrentSession());
+        }
+
+        if (sessions == null || sessions.isEmpty() || (!currentDeviceTracked && refreshTokenHeader != null)) {
+            com.vaultx.entity.User userEntity = userService.getUserEntityById(currentUserId);
+            if (userEntity != null) {
+                String refToken = refreshTokenHeader != null ? refreshTokenHeader : UUID.randomUUID().toString();
+                String ip = request.getHeader("X-Forwarded-For");
+                if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                    ip = request.getRemoteAddr();
+                }
+                
+                // Track this new device if we haven't seen this refresh token
+                if (!currentDeviceTracked) {
+                    sessionManagementService.trackSession(userEntity, refToken, ip, request.getHeader("User-Agent"));
+                    sessions = sessionManagementService.getUserSessions(currentUserId, refToken);
+                }
+            }
+        }
+        
+        return ResponseEntity.ok(ApiResponse.success("Sessions retrieved", sessions));
+    }
+
+    @GetMapping("/sessions/heartbeat")
+    @Operation(summary = "Check if current device session is still active")
+    public ResponseEntity<?> checkSessionHeartbeat(jakarta.servlet.http.HttpServletRequest request) {
+        String refreshToken = request.getHeader("X-Refresh-Token");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.status(401).body(ApiResponse.error("No refresh token provided", null));
+        }
+        
+        boolean exists = sessionManagementService.isSessionActive(refreshToken);
+        if (!exists) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Session terminated", null));
+        }
+        return ResponseEntity.ok(ApiResponse.success("Session active", true));
     }
 
     @DeleteMapping("/sessions/{id}")
@@ -98,5 +136,45 @@ public class UserController {
         UUID currentUserId = userService.getCurrentUser().getId();
         sessionManagementService.deleteSession(currentUserId, id);
         return ResponseEntity.ok(ApiResponse.success("Session terminated successfully", null));
+    }
+
+    @PostMapping("/face-biometric")
+    @Operation(summary = "Update or enroll Face ID biometrics")
+    public ResponseEntity<ApiResponse<Void>> updateFaceBiometrics(@RequestBody String faceData) {
+        log.debug("POST /users/face-biometric");
+        UUID currentUserId = userService.getCurrentUser().getId();
+        userService.updateFaceBiometrics(currentUserId, faceData);
+        return ResponseEntity.ok(ApiResponse.success("Face ID Biometrics updated successfully", null));
+    }
+
+    @PostMapping("/wallet-password")
+    @Operation(summary = "Update wallet security password")
+    public ResponseEntity<ApiResponse<Void>> updateWalletPassword(@RequestBody String walletPassword) {
+        log.debug("POST /users/wallet-password");
+        UUID currentUserId = userService.getCurrentUser().getId();
+        userService.updateWalletPassword(currentUserId, walletPassword);
+        return ResponseEntity.ok(ApiResponse.success("Wallet Password updated successfully", null));
+    }
+
+    @PostMapping("/verify-pin")
+    @Operation(summary = "Verify 6-digit Vault PIN for confidential document unlock")
+    public ResponseEntity<ApiResponse<Boolean>> verifyPin(@RequestBody Map<String, String> body) {
+        log.debug("POST /users/verify-pin");
+        UUID currentUserId = userService.getCurrentUser().getId();
+        String pin = body.get("pin");
+        boolean valid = userService.verifyVaultPin(currentUserId, pin);
+        if (valid) {
+            return ResponseEntity.ok(ApiResponse.success("Vault PIN verified successfully", true));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Invalid Vault PIN", false));
+        }
+    }
+
+    @GetMapping("/storage-stats")
+    @Operation(summary = "Get current user's storage statistics")
+    public ResponseEntity<ApiResponse<com.vaultx.dto.user.UserStorageStatsDto>> getStorageStats() {
+        log.debug("GET /users/storage-stats");
+        UUID currentUserId = userService.getCurrentUser().getId();
+        return ResponseEntity.ok(ApiResponse.success("Storage stats retrieved", userService.getUserStorageStats(currentUserId)));
     }
 }

@@ -12,14 +12,16 @@ export default function AdminSettingsPage() {
     <div className="max-w-4xl mx-auto space-y-8 pb-8">
       
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2"><Settings className="w-6 h-6 text-primary"/> System Configuration</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage global enterprise settings</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+          <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0"/> System Configuration
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">Manage global enterprise settings</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         
         {/* Core Settings */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 border-b border-gray-100 pb-4"><Server className="w-5 h-5"/> Platform Configuration</h2>
           
           <div className="grid sm:grid-cols-2 gap-6">
@@ -43,24 +45,24 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Security Settings */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 border-b border-gray-100 pb-4"><Shield className="w-5 h-5 text-amber-500"/> Enterprise Security</h2>
           
           <div className="space-y-4">
-            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer">
-              <div>
-                <span className="block font-bold text-gray-800">Enable Maintenance Mode</span>
-                <span className="text-xs text-gray-500">Locks out all non-admin users from the platform.</span>
+            <label className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer">
+              <div className="flex-1">
+                <span className="block font-bold text-gray-800 text-sm sm:text-base">Enable Maintenance Mode</span>
+                <span className="text-xs text-gray-500 mt-0.5 block">Locks out all non-admin users from the platform.</span>
               </div>
-              <input type="checkbox" className="w-5 h-5 rounded text-primary" />
+              <input type="checkbox" className="w-5 h-5 rounded text-primary shrink-0" />
             </label>
             
-            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer">
-              <div>
-                <span className="block font-bold text-gray-800">Allow New Registrations</span>
-                <span className="text-xs text-gray-500">Let new users sign up via the public register page.</span>
+            <label className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer">
+              <div className="flex-1">
+                <span className="block font-bold text-gray-800 text-sm sm:text-base">Allow New Registrations</span>
+                <span className="text-xs text-gray-500 mt-0.5 block">Let new users sign up via the public register page.</span>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-primary" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-primary shrink-0" />
             </label>
           </div>
         </div>

@@ -10,12 +10,17 @@ const aiService = {
   triggerOcr: (documentId) => api.post(`/engine/ocr/process/${documentId}`),
   triggerClassification: (documentId) => api.post(`/engine/ai/classify/${documentId}`),
   analyzeDocument: (documentId) => api.get(`/engine/ai/analyze/${documentId}`),
+  analyzePreview: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/engine/ai/analyze-preview', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   applySuggestions: (documentId, params) => {
-    const formattedParams = { ...params };
-    if (Array.isArray(formattedParams.tags)) {
-      formattedParams.tags = formattedParams.tags.join(',');
-    }
-    return api.post(`/engine/ai/apply-suggestions/${documentId}`, null, { params: formattedParams });
+    return api.post(`/engine/ai/apply-suggestions/${documentId}`, params);
   }
 };
 

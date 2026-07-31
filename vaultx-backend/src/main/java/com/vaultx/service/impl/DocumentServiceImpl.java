@@ -13,6 +13,7 @@ import com.vaultx.service.DocumentActivityService;
 import com.vaultx.service.DocumentService;
 import com.vaultx.service.StorageService;
 import com.vaultx.service.VirusScanService;
+import com.vaultx.service.OcrEngineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -51,6 +52,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentActivityService activityService;
     private final SecurityUtils securityUtils;
     private final DocumentMapper documentMapper;
+    private final OcrEngineService ocrEngineService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -161,6 +163,13 @@ public class DocumentServiceImpl implements DocumentService {
         // 6. Save Entity & Log Activity
         Document savedDocument = documentRepository.save(document);
         activityService.logActivity(savedDocument, user, "UPLOAD", "Uploaded document: " + originalFilename);
+
+        // Trigger OCR engine (which will subsequently trigger AI Classification)
+        try {
+            ocrEngineService.processDocument(savedDocument.getId());
+        } catch (Exception e) {
+            log.error("Failed to queue document {} for OCR processing", savedDocument.getId(), e);
+        }
 
         return documentMapper.toDto(savedDocument);
     }

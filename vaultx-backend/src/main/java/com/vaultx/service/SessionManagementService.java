@@ -12,6 +12,9 @@ public interface SessionManagementService {
     void updateSessionActivity(String refreshToken);
     void invalidateSession(String refreshToken);
     void invalidateAllUserSessions(UUID userId);
+
+    boolean isSessionActive(String refreshToken);
+
     List<SessionDto> getUserSessions(UUID userId, String currentRefreshToken);
     void deleteSession(UUID userId, UUID sessionId);
 }

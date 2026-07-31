@@ -92,12 +92,12 @@ export default function DocumentExplorer({
         </div>
       ) : (
         <div className={viewMode === 'grid' 
-          ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-          : "flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"
+          : "flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto"
         }>
           
           {viewMode === 'list' && (
-            <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[800px]">
               <div className="col-span-6 md:col-span-5">Name</div>
               <div className="hidden md:block col-span-2">Category</div>
               <div className="col-span-3 md:col-span-2">Size</div>
@@ -110,29 +110,32 @@ export default function DocumentExplorer({
             viewMode === 'grid' ? (
               <div 
                 key={doc.id} 
-                className="group relative bg-white border border-gray-100 rounded-2xl p-4 hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col"
+                className="group relative bg-white border border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col overflow-hidden"
                 onClick={() => navigate(`/dashboard/documents/${doc.id}`)}
               >
+                {/* Decorative blob on hover */}
+                <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500 pointer-events-none" />
+
                 {doc.favourite && (
-                  <div className="absolute top-3 left-3 z-10">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 drop-shadow-sm">
+                    <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
                   </div>
                 )}
                 
-                <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="relative flex items-center gap-1">
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 z-10 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="relative flex items-center gap-0.5 sm:gap-1">
                     <button 
                       onClick={(e) => { e.stopPropagation(); onAction('preview', doc); }}
-                      className="p-1.5 bg-white shadow-sm rounded-lg text-gray-500 hover:text-primary transition-colors"
+                      className="p-1 sm:p-1.5 bg-white/80 backdrop-blur shadow-sm rounded-md sm:rounded-lg text-gray-500 hover:text-primary transition-colors"
                       title="Preview"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === doc.id ? null : doc.id); }}
-                      className="p-1.5 bg-white shadow-sm rounded-lg text-gray-500 hover:text-primary transition-colors"
+                      className="p-1 sm:p-1.5 bg-white/80 backdrop-blur shadow-sm rounded-md sm:rounded-lg text-gray-500 hover:text-primary transition-colors"
                     >
-                      <MoreVertical className="w-4 h-4" />
+                      <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                     
                     {activeMenu === doc.id && (
@@ -156,24 +159,26 @@ export default function DocumentExplorer({
                   </div>
                 </div>
 
-                <div className="h-32 bg-gray-50 rounded-xl mb-3 flex items-center justify-center">
-                  {getFileIcon(doc.mimeType, doc.extension)}
+                <div className="h-20 sm:h-32 bg-gray-50/80 rounded-lg sm:rounded-xl mb-2 sm:mb-3 flex items-center justify-center group-hover:bg-primary/5 transition-colors group-hover:scale-[1.02] transform duration-300">
+                  <div className="group-hover:scale-110 transition-transform duration-300">
+                    {getFileIcon(doc.mimeType, doc.extension)}
+                  </div>
                 </div>
                 
-                <h3 className="font-medium text-gray-800 text-sm truncate mb-1" title={doc.displayName}>
+                <h3 className="font-semibold text-gray-800 text-xs sm:text-sm truncate mb-1 relative z-10" title={doc.displayName}>
                   {doc.displayName}
                 </h3>
                 
-                <div className="flex items-center justify-between text-xs text-gray-500 mt-auto">
-                  <span>{formatSize(doc.fileSize)}</span>
-                  {doc.category && <span className="bg-gray-100 px-2 py-0.5 rounded">{doc.category.name}</span>}
+                <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500 mt-auto relative z-10">
+                  <span className="font-medium">{formatSize(doc.fileSize)}</span>
+                  {doc.category && <span className="bg-gray-100 px-1.5 py-0.5 rounded-md font-medium text-gray-600 truncate max-w-[60px] sm:max-w-[80px]">{doc.category.name}</span>}
                 </div>
               </div>
             ) : (
               // List View
               <div 
                 key={doc.id} 
-                className="grid grid-cols-12 gap-4 p-4 border-b border-gray-50 hover:bg-gray-50/80 transition-colors items-center cursor-pointer group"
+                className="grid grid-cols-12 gap-4 p-4 border-b border-gray-50 hover:bg-gray-50/80 transition-colors items-center cursor-pointer group min-w-[800px]"
                 onClick={() => navigate(`/dashboard/documents/${doc.id}`)}
               >
                 <div className="col-span-6 md:col-span-5 flex items-center gap-3 min-w-0">

@@ -29,6 +29,19 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email")
     Optional<User> findByEmailWithRoles(@Param("email") String email);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE LOWER(u.email) = LOWER(:id) OR LOWER(u.username) = LOWER(:id) OR u.phoneNumber = :id")
+    Optional<User> findByIdentifierWithRoles(@Param("id") String identifier);
     
     Page<User> findByEmailContainingIgnoreCaseOrUsernameContainingIgnoreCase(String email, String username, Pageable pageable);
+    
+    @Query("SELECT u FROM User u WHERE " +
+           "(:status = 'ALL' OR " +
+           "  (:status = 'ACTIVE' AND u.active = true AND u.deleted = false) OR " +
+           "  (:status = 'SUSPENDED' AND u.active = false AND u.deleted = false) OR " +
+           "  (:status = 'DELETED' AND u.deleted = true)) AND " +
+           "(:search IS NULL OR :search = '' OR LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<User> searchUsersWithStatus(@Param("search") String search, @Param("status") String status, Pageable pageable);
+    
+    long countByActive(boolean active);
 }

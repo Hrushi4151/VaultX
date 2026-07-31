@@ -57,7 +57,7 @@ public class AdminAnalyticsServiceImpl implements AdminAnalyticsService {
                 .onlineUsers(random.nextInt(20) + 1)
                 
                 .totalDocuments(documentRepository.count())
-                .totalStorageUsed(1024L * 1024L * 1024L * 5L + random.nextInt(10000000)) // ~5GB mock
+                .totalStorageUsed(documentRepository.sumTotalFileSize())
                 .totalSharedLinks(shareRepository.count())
                 .totalOcrJobs(ocrRepository.count())
                 .totalAiClassifications(aiRepository.count())

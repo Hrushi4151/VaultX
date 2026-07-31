@@ -53,9 +53,19 @@ public class User extends BaseEntity {
     @Column(name = "vault_pin_hash")
     private String vaultPinHash;
 
+    @Column(name = "wallet_password_hash")
+    private String walletPasswordHash;
+
+    @Column(name = "face_data", columnDefinition = "TEXT")
+    private String faceData;
+
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
 
     @Column(name = "is_email_verified", nullable = false)
     @Builder.Default

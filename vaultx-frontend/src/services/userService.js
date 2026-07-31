@@ -43,8 +43,37 @@ const userService = {
     return response.data;
   },
 
+  checkSessionHeartbeat: async () => {
+    const response = await api.get('/users/sessions/heartbeat');
+    return response.data;
+  },
+
   terminateSession: async (sessionId) => {
     const response = await api.delete(`/users/sessions/${sessionId}`);
+    return response.data;
+  },
+
+  updateFaceBiometrics: async (faceData) => {
+    const response = await api.post('/users/face-biometric', faceData, {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    return response.data;
+  },
+
+  updateWalletPassword: async (walletPassword) => {
+    const response = await api.post('/users/wallet-password', walletPassword, {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    return response.data;
+  },
+
+  verifyPin: async (pin) => {
+    const response = await api.post('/users/verify-pin', { pin });
+    return response.data;
+  },
+
+  getStorageStats: async () => {
+    const response = await api.get('/users/storage-stats');
     return response.data;
   }
 };

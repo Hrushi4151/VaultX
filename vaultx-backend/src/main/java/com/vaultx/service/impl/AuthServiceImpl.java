@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
     private final SecurityLogService securityLogService;
     private final SessionManagementService sessionManagementService;
     private final UserMapper userMapper;
+    private final com.vaultx.security.FaceBiometricMatcher faceBiometricMatcher;
 
     private static final int MAX_LOGIN_ATTEMPTS = 5;
     private static final int LOCK_TIME_DURATION_MINUTES = 15;
@@ -162,6 +163,8 @@ public class AuthServiceImpl implements AuthService {
                 .email(email)
                 .phoneNumber(request.getPhoneNumber())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .walletPasswordHash(request.getWalletPassword() != null && !request.getWalletPassword().isBlank() ? passwordEncoder.encode(request.getWalletPassword()) : null)
+                .faceData(request.getFaceData())
                 .country(request.getCountry())
                 .active(true)
                 .emailVerified(true)
@@ -195,36 +198,16 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .walletPasswordHash(request.getWalletPassword() != null && !request.getWalletPassword().isBlank() ? passwordEncoder.encode(request.getWalletPassword()) : null)
+                .faceData(request.getFaceData())
                 .country(request.getCountry())
                 .active(true)
-                .emailVerified(false)
-                .phoneNumberVerified(false)
+                .emailVerified(true)
+                .phoneNumberVerified(true)
                 .build();
 
         user.getRoles().add(userRole);
-        user = userRepository.save(user);
-
-        // Generate Email Verification Token
-        String emailToken = UUID.randomUUID().toString();
-        EmailVerificationToken verificationToken = EmailVerificationToken.builder()
-                .token(emailToken)
-                .user(user)
-                .expiryDate(Instant.now().plus(24, ChronoUnit.HOURS))
-                .build();
-        emailVerificationTokenRepository.save(verificationToken);
-
-        // Generate SMS OTP
-        String otp = String.format("%06d", new Random().nextInt(999999));
-        OtpVerificationToken otpToken = OtpVerificationToken.builder()
-                .token(otp)
-                .user(user)
-                .expiryDate(Instant.now().plus(15, ChronoUnit.MINUTES))
-                .build();
-        otpVerificationTokenRepository.save(otpToken);
-
-        // Send notifications
-        notificationService.sendVerificationEmail(user.getEmail(), emailToken);
-        notificationService.sendSmsOtp(user.getPhoneNumber(), otp);
+        userRepository.save(user);
     }
 
     @Override
@@ -307,6 +290,90 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenProvider.generateToken(user);
         String refreshTokenStr = UUID.randomUUID().toString();
         
+        sessionManagementService.trackSession(user, refreshTokenStr, getClientIp(httpRequest), httpRequest.getHeader("User-Agent"));
+        securityLogService.logAction(user, SecurityAction.LOGIN, getClientIp(httpRequest));
+
+        return JwtAuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshTokenStr)
+                .tokenType("Bearer")
+                .user(userMapper.toDto(user))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public JwtAuthenticationResponse walletLogin(WalletLoginRequest request, HttpServletRequest httpRequest) {
+        String id = request.getIdentifier().trim();
+        User user = userRepository.findByIdentifierWithRoles(id)
+                .orElseThrow(() -> new BadCredentialsException("Invalid identifier or wallet password"));
+
+        checkLoginAttempts(user.getEmail());
+
+        if (!user.isActive()) {
+            throw new BusinessException("Account is disabled");
+        }
+
+        if (user.getWalletPasswordHash() == null) {
+            throw new BusinessException("Wallet password is not configured for this account");
+        }
+
+        boolean matchesWallet = passwordEncoder.matches(request.getWalletPassword(), user.getWalletPasswordHash());
+
+        if (!matchesWallet) {
+            handleFailedLogin(user.getEmail());
+            throw new BadCredentialsException("Invalid wallet password");
+        }
+
+        resetLoginAttempts(user.getEmail());
+
+        String accessToken = tokenProvider.generateToken(user);
+        String refreshTokenStr = UUID.randomUUID().toString();
+        
+        sessionManagementService.trackSession(user, refreshTokenStr, getClientIp(httpRequest), httpRequest.getHeader("User-Agent"));
+        securityLogService.logAction(user, SecurityAction.LOGIN, getClientIp(httpRequest));
+
+        return JwtAuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshTokenStr)
+                .tokenType("Bearer")
+                .user(userMapper.toDto(user))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public JwtAuthenticationResponse faceLogin(FaceLoginRequest request, HttpServletRequest httpRequest) {
+        String id = request.getIdentifier().trim();
+        User user = userRepository.findByIdentifierWithRoles(id)
+                .orElseThrow(() -> new BadCredentialsException("User identity not found for Face ID scan"));
+
+        if (!user.isActive()) {
+            throw new BusinessException("Account is disabled");
+        }
+
+        if (user.getFaceData() == null || user.getFaceData().isBlank()) {
+            throw new BusinessException("No Face ID biometric data enrolled for this account. Please register your face first.");
+        }
+
+        String candidateFace = request.getFaceData().trim();
+        if (candidateFace.isBlank() || candidateFace.length() < 20) {
+            throw new BusinessException("Invalid or incomplete face scan sample");
+        }
+
+        // Strict Biometric Vector Feature Comparison
+        boolean isMatch = faceBiometricMatcher.isFaceMatch(user.getFaceData(), candidateFace);
+        if (!isMatch) {
+            handleFailedLogin(user.getEmail());
+            throw new BadCredentialsException("Face ID Biometric Mismatch! Scanned face does not match the enrolled account owner.");
+        }
+
+        resetLoginAttempts(user.getEmail());
+        log.info("Face ID Biometric Verification successful for user: {}", user.getEmail());
+
+        String accessToken = tokenProvider.generateToken(user);
+        String refreshTokenStr = UUID.randomUUID().toString();
+
         sessionManagementService.trackSession(user, refreshTokenStr, getClientIp(httpRequest), httpRequest.getHeader("User-Agent"));
         securityLogService.logAction(user, SecurityAction.LOGIN, getClientIp(httpRequest));
 
