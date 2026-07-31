@@ -15,11 +15,7 @@ class FaceMatchRequest(BaseModel):
 
 app = FastAPI(title="VaultX AI Service")
 
-# Initialize EasyOCR reader (downloads model weights on first run)
-# We initialize it globally so it stays loaded in memory for fast inference.
-print("Initializing EasyOCR Model (This may take a minute on first run...)")
-reader = easyocr.Reader(['en'])
-print("EasyOCR Model loaded.")
+reader = None # Lazy load EasyOCR
 
 @app.get("/api/v1/health")
 async def health_check():
@@ -37,6 +33,12 @@ async def extract_text(file: UploadFile = File(...)):
         # Read file bytes
         contents = await file.read()
         extracted_text = ""
+        
+        global reader
+        if reader is None:
+            print("Lazy loading EasyOCR Model...")
+            reader = easyocr.Reader(['en'])
+            print("EasyOCR Model loaded.")
         
         # Check if PDF
         is_pdf = file.filename.lower().endswith('.pdf') or file.content_type == 'application/pdf'
@@ -111,9 +113,9 @@ async def match_faces(request: FaceMatchRequest):
             img1_path=reg_img, 
             img2_path=cand_img,
             enforce_detection=True,
-            detector_backend='mtcnn', # mtcnn is much more robust than opencv
-            model_name='VGG-Face',      # Enterprise grade default
-            anti_spoofing=True          # Enable Liveness Detection (blocks photos/screens)
+            detector_backend='opencv', # opencv is much lighter for 512MB RAM
+            model_name='Facenet',      # Facenet is much lighter than VGG-Face
+            anti_spoofing=False         # Disabled to save memory on Render Free Tier
         )
         
         is_match = bool(result.get("verified", False))
