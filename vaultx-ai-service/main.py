@@ -115,7 +115,7 @@ async def match_faces(request: FaceMatchRequest):
             img2_path=cand_img,
             enforce_detection=True,
             detector_backend='opencv', # opencv is much lighter for 512MB RAM
-            model_name='Facenet',      # Facenet is much lighter than VGG-Face
+            model_name='SFace',        # SFace uses OpenCV internally, skipping TensorFlow!
             anti_spoofing=False         # Disabled to save memory on Render Free Tier
         )
         
