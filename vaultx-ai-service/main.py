@@ -41,6 +41,14 @@ async def extract_text(file: UploadFile = File(...)):
             torch.set_num_threads(1) # Save memory
             reader = easyocr.Reader(['en'])
             print("EasyOCR Model loaded.")
+            
+        # Helper function to prevent Out Of Memory (OOM) 502 errors by shrinking huge images
+        def resize_for_memory(image_array, max_dim=1024):
+            h, w = image_array.shape[:2]
+            if max(h, w) > max_dim:
+                scale = max_dim / max(h, w)
+                return cv2.resize(image_array, (int(w * scale), int(h * scale)))
+            return image_array
         
         # Check if PDF
         is_pdf = file.filename.lower().endswith('.pdf') or file.content_type == 'application/pdf'
@@ -50,7 +58,8 @@ async def extract_text(file: UploadFile = File(...)):
             doc = fitz.open(stream=contents, filetype="pdf")
             for page_num in range(len(doc)):
                 page = doc.load_page(page_num)
-                pix = page.get_pixmap(dpi=150)
+                # Lower DPI to 72 to drastically save RAM on 1GB limit
+                pix = page.get_pixmap(dpi=72)
                 img_array = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.h, pix.w, pix.n)
                 
                 if pix.n == 3:
@@ -58,6 +67,7 @@ async def extract_text(file: UploadFile = File(...)):
                 elif pix.n == 4:
                     img_array = cv2.cvtColor(img_array, cv2.COLOR_RGBA2BGR)
                     
+                img_array = resize_for_memory(img_array)
                 results = reader.readtext(img_array, detail=0, paragraph=True)
                 if len(doc) > 1:
                     extracted_text += f"\n--- Page {page_num + 1} ---\n"
@@ -70,6 +80,7 @@ async def extract_text(file: UploadFile = File(...)):
             if img is None:
                 raise HTTPException(status_code=400, detail="Could not decode image or PDF.")
 
+            img = resize_for_memory(img)
             results = reader.readtext(img, detail=0, paragraph=True)
             extracted_text = "\n\n".join(results)
         
