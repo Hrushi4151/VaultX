@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String jwt = authHeader.substring(jwtConfig.getTokenPrefix().length());
+        final String jwt = authHeader.substring(jwtConfig.getTokenPrefix().length()).trim();
 
         try {
             if (jwtTokenProvider.validateToken(jwt)) {
