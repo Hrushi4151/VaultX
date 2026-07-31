@@ -10,8 +10,16 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install
+# Copy requirements
 COPY requirements.txt .
+
+# Install CPU-only PyTorch first (saves ~1.5GB of GPU drivers)
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu --no-cache-dir
+
+# Install CPU-only TensorFlow first (saves ~1GB of GPU drivers)
+RUN pip install tensorflow-cpu==2.16.1 --no-cache-dir
+
+# Install the rest of the requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
