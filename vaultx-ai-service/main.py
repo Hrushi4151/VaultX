@@ -45,7 +45,7 @@ def get_reader():
     return reader
 
 
-def resize_image(img, max_dim=1024):
+def resize_image(img, max_dim=640):
     h, w = img.shape[:2]
 
     if max(h, w) <= max_dim:
