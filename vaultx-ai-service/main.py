@@ -1,12 +1,13 @@
 import uvicorn
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
+import easyocr
 import numpy as np
 import cv2
-import fitz
+import fitz  # PyMuPDF
 import base64
 from pydantic import BaseModel
-# DO NOT import easyocr or torch here to save 300MB RAM! They are lazy-loaded.
+from deepface import DeepFace
 
 class FaceMatchRequest(BaseModel):
     registeredImage: str
@@ -14,7 +15,11 @@ class FaceMatchRequest(BaseModel):
 
 app = FastAPI(title="VaultX AI Service")
 
-reader = None # Lazy load EasyOCR
+# Initialize EasyOCR reader (downloads model weights on first run)
+# We initialize it globally so it stays loaded in memory for fast inference.
+print("Initializing EasyOCR Model (This may take a minute on first run...)")
+reader = easyocr.Reader(['en'])
+print("EasyOCR Model loaded.")
 
 @app.get("/api/v1/health")
 async def health_check():
@@ -32,15 +37,6 @@ async def extract_text(file: UploadFile = File(...)):
         # Read file bytes
         contents = await file.read()
         extracted_text = ""
-        
-        global reader
-        if reader is None:
-            print("Lazy loading EasyOCR Model...")
-            import easyocr
-            import torch
-            torch.set_num_threads(1) # Save memory
-            reader = easyocr.Reader(['en'])
-            print("EasyOCR Model loaded.")
         
         # Check if PDF
         is_pdf = file.filename.lower().endswith('.pdf') or file.content_type == 'application/pdf'
@@ -109,16 +105,31 @@ async def match_faces(request: FaceMatchRequest):
         if reg_img is None or cand_img is None:
             raise HTTPException(status_code=400, detail="Invalid image data provided.")
 
-        print("Using Pure OpenCV SFace matcher...")
-        import sface_matcher
+        print("Processing face verification via DeepFace...")
+        # Enforce detection ensures that if no face is found, it throws an exception (which we catch)
+        result = DeepFace.verify(
+            img1_path=reg_img, 
+            img2_path=cand_img,
+            enforce_detection=True,
+            detector_backend='mtcnn', # mtcnn is much more robust than opencv
+            model_name='VGG-Face',      # Enterprise grade default
+            anti_spoofing=True          # Enable Liveness Detection (blocks photos/screens)
+        )
         
-        # This pure OpenCV implementation uses absolutely no TensorFlow, keeping RAM < 100MB!
-        is_match, score = sface_matcher.is_match(reg_img, cand_img)
+        is_match = bool(result.get("verified", False))
+        distance = float(result.get("distance", 1.0))
         
-        # Fake a distance so the frontend continues to work
-        distance = 1.0 - score
-        is_real = True # Liveness spoof detection disabled for extreme memory saving
+        # Strict Liveness Detection Check
+        # DeepFace sets 'is_real' in facial_areas for img1/img2 or in the root result
+        is_real = True
+        facial_areas = result.get("facial_areas", {})
         
+        if "img2" in facial_areas and isinstance(facial_areas["img2"], dict):
+            if "is_real" in facial_areas["img2"]:
+                is_real = bool(facial_areas["img2"]["is_real"])
+        elif "is_real" in result:
+            is_real = bool(result["is_real"])
+            
         if is_match and not is_real:
             print("🚨 SPOOF DETECTED! Face matched but liveness check failed.")
             is_match = False
@@ -148,4 +159,4 @@ async def match_faces(request: FaceMatchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
