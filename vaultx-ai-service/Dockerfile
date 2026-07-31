@@ -23,6 +23,9 @@ RUN mkdir -p /app/models && \
     curl -L -o /app/models/face_detection_yunet_2023mar.onnx https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx && \
     curl -L -o /app/models/face_recognition_sface_2021dec.onnx https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx
 
+# Pre-download EasyOCR models
+RUN python -c "import easyocr; easyocr.Reader(['en'])"
+
 # Expose port
 EXPOSE 8001
 
