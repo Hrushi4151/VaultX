@@ -39,7 +39,7 @@ public class PdfSettings {
     private String watermarkText;
 
     @Column(name = "watermark_opacity", columnDefinition = "decimal(3,2)")
-    private Double watermarkOpacity;
+    private java.math.BigDecimal watermarkOpacity;
 
     @Column(name = "watermark_rotation")
     private Integer watermarkRotation;

@@ -6,9 +6,9 @@ spring:
     name: vaultx-backend
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/vaultx}
+    username: ${DB_USERNAME:vaultx}
+    password: ${DB_PASSWORD:vaultx_1234}
     driver-class-name: org.postgresql.Driver
 
     hikari:
