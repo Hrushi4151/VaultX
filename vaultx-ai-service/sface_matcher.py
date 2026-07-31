@@ -10,17 +10,22 @@ def download_file(url, filepath):
         urllib.request.urlretrieve(url, filepath)
 
 def get_face_features(img_cv2):
-    # Models are from OpenCV Zoo (Yunet for detection, SFace for recognition)
-    yunet_url = "https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx"
-    sface_url = "https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx"
+    # Models are pre-downloaded via Dockerfile to /app/models
+    yunet_path = "/app/models/face_detection_yunet_2023mar.onnx"
+    sface_path = "/app/models/face_recognition_sface_2021dec.onnx"
     
-    os.makedirs("models", exist_ok=True)
-    yunet_path = "models/face_detection_yunet_2023mar.onnx"
-    sface_path = "models/face_recognition_sface_2021dec.onnx"
-    
-    download_file(yunet_url, yunet_path)
-    download_file(sface_url, sface_path)
-    
+    # Fallback for local development (if not running in Docker)
+    if not os.path.exists(yunet_path) or not os.path.exists(sface_path):
+        yunet_path = "models/face_detection_yunet_2023mar.onnx"
+        sface_path = "models/face_recognition_sface_2021dec.onnx"
+        if not os.path.exists(yunet_path):
+            os.makedirs("models", exist_ok=True)
+            print("Downloading Yunet...")
+            urllib.request.urlretrieve("https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx", yunet_path)
+        if not os.path.exists(sface_path):
+            print("Downloading SFace...")
+            urllib.request.urlretrieve("https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx", sface_path)
+            
     height, width, _ = img_cv2.shape
     detector = cv2.FaceDetectorYN.create(yunet_path, "", (width, height))
     recognizer = cv2.FaceRecognizerSF.create(sface_path, "")
@@ -45,7 +50,11 @@ def is_match(img1_cv2, img2_cv2, threshold=0.363):
     if feat1 is None or feat2 is None:
         raise HTTPException(status_code=400, detail="Face could not be detected in one or both images.")
         
-    recognizer = cv2.FaceRecognizerSF.create("models/face_recognition_sface_2021dec.onnx", "")
+    sface_path = "/app/models/face_recognition_sface_2021dec.onnx"
+    if not os.path.exists(sface_path):
+        sface_path = "models/face_recognition_sface_2021dec.onnx"
+        
+    recognizer = cv2.FaceRecognizerSF.create(sface_path, "")
     
     # Compute Cosine distance
     score = recognizer.match(feat1, feat2, cv2.FaceRecognizerSF_FR_COSINE)
