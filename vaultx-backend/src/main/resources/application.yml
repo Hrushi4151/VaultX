@@ -46,7 +46,7 @@ spring:
 
 vaultx:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:dGhpcy1pcy1hLXZlcnktbG9uZy1hbmQtc2VjdXJlLWp3dC1zZWNyZXQta2V5LWZvci12YXVsdHg=}
     expiration: ${JWT_EXPIRATION:86400000}
     refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
     token-prefix: Bearer
@@ -69,11 +69,11 @@ vaultx:
     name: VaultX
 
   pingram:
-    api-key: ${PINGRAM_API_KEY}
+    api-key: ${PINGRAM_API_KEY:dummy_key}
 
   ai:
     gemini:
-      api-key: ${GEMINI_API_KEY}
+      api-key: ${GEMINI_API_KEY:dummy_key}
       model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
       ocr-model: ${GEMINI_OCR_MODEL:gemini-3.5-flash-lite}
       chat-model: ${GEMINI_CHAT_MODEL:gemini-3.5-flash-lite}
