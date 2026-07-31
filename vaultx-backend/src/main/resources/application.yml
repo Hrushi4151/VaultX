@@ -59,10 +59,10 @@ vaultx:
     url: ${FRONTEND_URL:http://localhost:5173}
 
   minio:
-    url: ${MINIO_URL:http://localhost:9000}
-    access-key: ${MINIO_ACCESS_KEY:minioadmin}
-    secret-key: ${MINIO_SECRET_KEY:minioadmin}
-    bucket-name: ${MINIO_BUCKET_NAME:vaultx-documents}
+    url: ${R2_ENDPOINT_URL:${MINIO_URL:http://localhost:9000}}
+    access-key: ${R2_ACCESS_KEY_ID:${MINIO_ACCESS_KEY:minioadmin}}
+    secret-key: ${R2_SECRET_ACCESS_KEY:${MINIO_SECRET_KEY:minioadmin}}
+    bucket-name: ${R2_BUCKET_NAME:${MINIO_BUCKET_NAME:vaultx-documents}}
 
   app:
     version: 1.0.0
