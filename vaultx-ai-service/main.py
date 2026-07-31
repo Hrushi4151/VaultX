@@ -7,7 +7,7 @@ import cv2
 import fitz  # PyMuPDF
 import base64
 from pydantic import BaseModel
-from deepface import DeepFace
+# from deepface import DeepFace (lazy loaded now)
 
 class FaceMatchRequest(BaseModel):
     registeredImage: str
@@ -107,7 +107,8 @@ async def match_faces(request: FaceMatchRequest):
         if reg_img is None or cand_img is None:
             raise HTTPException(status_code=400, detail="Invalid image data provided.")
 
-        print("Processing face verification via DeepFace...")
+        print("Lazy loading DeepFace Model...")
+        from deepface import DeepFace
         # Enforce detection ensures that if no face is found, it throws an exception (which we catch)
         result = DeepFace.verify(
             img1_path=reg_img, 

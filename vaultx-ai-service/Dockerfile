@@ -20,5 +20,10 @@ COPY . .
 # Expose port
 EXPOSE 8001
 
+# Memory optimizations for 512MB RAM
+ENV MALLOC_ARENA_MAX=2
+ENV WEB_CONCURRENCY=1
+ENV MAX_WORKERS=1
+
 # Command to run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
