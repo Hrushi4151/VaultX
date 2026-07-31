@@ -1,164 +1,230 @@
-import uvicorn
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
-import numpy as np
+import os
+import base64
 import cv2
 import fitz
-import base64
+import numpy as np
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-# DO NOT import easyocr or torch here to save 300MB RAM! They are lazy-loaded.
+
+# DO NOT import easyocr here
+reader = None
+
+app = FastAPI(title="VaultX AI Service")
+
 
 class FaceMatchRequest(BaseModel):
     registeredImage: str
     candidateImage: str
 
-app = FastAPI(title="VaultX AI Service")
-
-reader = None # Lazy load EasyOCR
 
 @app.get("/api/v1/health")
-async def health_check():
-    return {"status": "UP", "service": "VaultX AI Service"}
+async def health():
+    return {"status": "UP"}
+
+
+def get_reader():
+    global reader
+
+    if reader is None:
+        print("========== LOADING EASYOCR ==========")
+
+        import easyocr
+        import torch
+
+        torch.set_num_threads(1)
+
+        reader = easyocr.Reader(
+            ['en'],
+            gpu=False,
+            download_enabled=False
+        )
+
+        print("========== EASYOCR READY ==========")
+
+    return reader
+
+
+def resize_image(img, max_dim=1024):
+    h, w = img.shape[:2]
+
+    if max(h, w) <= max_dim:
+        return img
+
+    scale = max_dim / max(h, w)
+
+    return cv2.resize(
+        img,
+        (int(w * scale), int(h * scale))
+    )
+
 
 @app.post("/api/v1/ai/ocr")
-async def extract_text(file: UploadFile = File(...)):
-    """
-    Accepts an image file and returns extracted text using EasyOCR.
-    """
-    # Relaxed content-type check because RestTemplate might send application/octet-stream
-    # We will rely on cv2.imdecode to validate if it's a valid image.
+async def ocr(file: UploadFile = File(...)):
 
     try:
-        # Read file bytes
+
+        print("================================")
+        print("OCR REQUEST RECEIVED")
+        print(file.filename)
+        print(file.content_type)
+        print("================================")
+
         contents = await file.read()
-        extracted_text = ""
-        
-        global reader
-        if reader is None:
-            print("Lazy loading EasyOCR Model...")
-            import easyocr
-            import torch
-            torch.set_num_threads(1) # Save memory
-            reader = easyocr.Reader(['en'])
-            print("EasyOCR Model loaded.")
-            
-        # Helper function to prevent Out Of Memory (OOM) 502 errors by shrinking huge images
-        def resize_for_memory(image_array, max_dim=1024):
-            h, w = image_array.shape[:2]
-            if max(h, w) > max_dim:
-                scale = max_dim / max(h, w)
-                return cv2.resize(image_array, (int(w * scale), int(h * scale)))
-            return image_array
-        
-        # Check if PDF
-        is_pdf = file.filename.lower().endswith('.pdf') or file.content_type == 'application/pdf'
-        
+
+        reader = get_reader()
+
+        text = ""
+
+        is_pdf = (
+            file.filename.lower().endswith(".pdf")
+            or file.content_type == "application/pdf"
+        )
+
         if is_pdf:
-            print(f"Processing PDF document: {file.filename}")
+
+            print("Processing PDF")
+
             doc = fitz.open(stream=contents, filetype="pdf")
-            for page_num in range(len(doc)):
-                page = doc.load_page(page_num)
-                # Lower DPI to 72 to drastically save RAM on 1GB limit
-                pix = page.get_pixmap(dpi=72)
-                img_array = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.h, pix.w, pix.n)
-                
-                if pix.n == 3:
-                    img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
-                elif pix.n == 4:
-                    img_array = cv2.cvtColor(img_array, cv2.COLOR_RGBA2BGR)
-                    
-                img_array = resize_for_memory(img_array)
-                results = reader.readtext(img_array, detail=0, paragraph=True)
-                if len(doc) > 1:
-                    extracted_text += f"\n--- Page {page_num + 1} ---\n"
-                extracted_text += "\n\n".join(results) + "\n"
+
+            for page in range(len(doc)):
+
+                print(f"Page {page+1}")
+
+                pix = doc.load_page(page).get_pixmap(dpi=72)
+
+                img = np.frombuffer(
+                    pix.samples,
+                    dtype=np.uint8
+                ).reshape(
+                    pix.h,
+                    pix.w,
+                    pix.n
+                )
+
+                if pix.n == 4:
+                    img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
+
+                elif pix.n == 3:
+                    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+                img = resize_image(img)
+
+                print("Running OCR...")
+
+                result = reader.readtext(
+                    img,
+                    detail=0,
+                    paragraph=False,
+                    batch_size=1,
+                    workers=0
+                )
+
+                print("Finished OCR")
+
+                text += "\n".join(result)
+                text += "\n"
+
             doc.close()
+
         else:
-            nparr = np.frombuffer(contents, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+            img = cv2.imdecode(
+                np.frombuffer(contents, np.uint8),
+                cv2.IMREAD_COLOR
+            )
 
             if img is None:
-                raise HTTPException(status_code=400, detail="Could not decode image or PDF.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid Image"
+                )
 
-            img = resize_for_memory(img)
-            results = reader.readtext(img, detail=0, paragraph=True)
-            extracted_text = "\n\n".join(results)
-        
-        print(f"--- OCR EXTRACTION SUCCESS ---")
-        print(f"File: {file.filename}")
-        print(f"Extracted Text:\n{extracted_text}")
-        print(f"------------------------------")
-        
-        return JSONResponse(content={
-            "success": True,
-            "text": extracted_text,
-            "engine": "EasyOCR"
-        })
+            img = resize_image(img)
 
-    except HTTPException as he:
-        raise he
+            print(img.shape)
+
+            print("Running OCR...")
+
+            result = reader.readtext(
+                img,
+                detail=0,
+                paragraph=False,
+                batch_size=1,
+                workers=0
+            )
+
+            print("OCR COMPLETE")
+
+            text = "\n".join(result)
+
+        print("SUCCESS")
+
+        return JSONResponse(
+            {
+                "success": True,
+                "text": text,
+                "engine": "EasyOCR"
+            }
+        )
+
     except Exception as e:
-        print(f"Error during OCR extraction: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+
+        print("OCR ERROR")
+        print(e)
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
 
 @app.post("/api/v1/ai/face-match")
-async def match_faces(request: FaceMatchRequest):
-    """
-    Accepts two base64 encoded images and verifies if they belong to the same person.
-    """
-    try:
-        # Decode base64 to numpy arrays
-        reg_bytes = base64.b64decode(request.registeredImage)
-        cand_bytes = base64.b64decode(request.candidateImage)
-        
-        reg_arr = np.frombuffer(reg_bytes, np.uint8)
-        cand_arr = np.frombuffer(cand_bytes, np.uint8)
-        
-        reg_img = cv2.imdecode(reg_arr, cv2.IMREAD_COLOR)
-        cand_img = cv2.imdecode(cand_arr, cv2.IMREAD_COLOR)
-        
-        if reg_img is None or cand_img is None:
-            raise HTTPException(status_code=400, detail="Invalid image data provided.")
+async def face_match(request: FaceMatchRequest):
 
-        print("Using Pure OpenCV SFace matcher...")
+    try:
+
+        reg = cv2.imdecode(
+            np.frombuffer(
+                base64.b64decode(request.registeredImage),
+                np.uint8
+            ),
+            cv2.IMREAD_COLOR
+        )
+
+        cand = cv2.imdecode(
+            np.frombuffer(
+                base64.b64decode(request.candidateImage),
+                np.uint8
+            ),
+            cv2.IMREAD_COLOR
+        )
+
         import sface_matcher
-        
-        # This pure OpenCV implementation uses absolutely no TensorFlow, keeping RAM < 100MB!
-        is_match, score = sface_matcher.is_match(reg_img, cand_img)
-        
-        # Fake a distance so the frontend continues to work
-        distance = 1.0 - score
-        is_real = True # Liveness spoof detection disabled for extreme memory saving
-        
-        if is_match and not is_real:
-            print("🚨 SPOOF DETECTED! Face matched but liveness check failed.")
-            is_match = False
-            
-        print(f"--- FACE VERIFICATION SUCCESS ---")
-        print(f"Match: {is_match}, Distance: {distance}, Real: {is_real}")
-        print(f"---------------------------------")
-        
-        return JSONResponse(content={
-            "success": True,
-            "match": is_match,
-            "confidence": 1.0 - distance, # rough confidence metric based on distance
-            "reason": "Verified successfully" if is_match else "Face Biometric Mismatch or Liveness Failed"
-        })
-        
-    except ValueError as ve:
-        # DeepFace raises ValueError if face could not be detected OR if Spoofing is detected
-        print(f"Face Detection/Spoofing Error: {str(ve)}")
-        return JSONResponse(content={
-            "success": False,
-            "match": False,
-            "confidence": 0.0,
-            "reason": "Authentication Failed: No valid face found OR Liveness check failed (Spoof detected)."
-        })
+
+        match, score = sface_matcher.is_match(reg, cand)
+
+        return JSONResponse(
+            {
+                "success": True,
+                "match": match,
+                "confidence": score
+            }
+        )
+
     except Exception as e:
-        print(f"Error during face verification: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 8080))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 8080))
+    )

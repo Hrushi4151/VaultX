@@ -1,43 +1,69 @@
-# Use an official Python runtime as a parent image
+# ===========================
+# Base Image
+# ===========================
 FROM python:3.10-slim
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
-# Install system dependencies required by OpenCV and EasyOCR
+# ===========================
+# System Dependencies
+# ===========================
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# ===========================
+# Copy Requirements
+# ===========================
 COPY requirements.txt .
+
+# Upgrade pip
+RUN pip install --upgrade pip
 
 # Install CPU-only PyTorch first (saves ~1.5GB of GPU drivers for EasyOCR)
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu --no-cache-dir
 
-# Install remaining requirements
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# ===========================
+# Copy Project
+# ===========================
 COPY . .
 
-# Pre-download OpenCV SFace ONNX models to avoid runtime timeouts on Render
+# ===========================
+# Download OpenCV Models
+# ===========================
 RUN mkdir -p /app/models && \
-    curl -L -o /app/models/face_detection_yunet_2023mar.onnx https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx && \
-    curl -L -o /app/models/face_recognition_sface_2021dec.onnx https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx
+    curl -L -o /app/models/face_detection_yunet_2023mar.onnx \
+    https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx && \
+    curl -L -o /app/models/face_recognition_sface_2021dec.onnx \
+    https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx
 
-# Pre-download EasyOCR models
-RUN python -c "import easyocr; easyocr.Reader(['en'])"
+# ===========================
+# Download EasyOCR Models During Build
+# ===========================
+RUN python -c "import easyocr; easyocr.Reader(['en'], gpu=False)"
 
-# Expose default port
+# ===========================
+# Environment
+# ===========================
+ENV PYTHONUNBUFFERED=1
+ENV MALLOC_ARENA_MAX=2
+ENV OMP_NUM_THREADS=1
+ENV OPENBLAS_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+ENV NUMEXPR_NUM_THREADS=1
+
+# ===========================
+# Railway Port
+# ===========================
 EXPOSE 8080
 
-# Memory optimizations
-ENV MALLOC_ARENA_MAX=2
-ENV WEB_CONCURRENCY=1
-ENV MAX_WORKERS=1
-
-# Command to run the application (uses PORT env var dynamically)
+# ===========================
+# Start FastAPI (Dynamic Port)
+# ===========================
 CMD ["python", "main.py"]
