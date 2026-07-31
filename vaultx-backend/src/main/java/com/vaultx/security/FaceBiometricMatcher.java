@@ -22,7 +22,10 @@ import java.util.Map;
 public class FaceBiometricMatcher {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String AI_SERVICE_URL = "http://localhost:8001/api/v1/ai/face-match";
+    
+    @org.springframework.beans.factory.annotation.Value("${vaultx.ai.service.url:http://localhost:8001}")
+    private String aiServiceUrl;
+    
     private final RestTemplate restTemplate = new RestTemplate();
 
     @PostConstruct
@@ -54,7 +57,8 @@ public class FaceBiometricMatcher {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(AI_SERVICE_URL, request, String.class);
+            String url = aiServiceUrl + "/api/v1/ai/face-match";
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 JsonNode root = objectMapper.readTree(response.getBody());
