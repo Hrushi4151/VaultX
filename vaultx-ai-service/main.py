@@ -1,13 +1,12 @@
 import uvicorn
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-import easyocr
 import numpy as np
 import cv2
-import fitz  # PyMuPDF
+import fitz
 import base64
 from pydantic import BaseModel
-# from deepface import DeepFace (lazy loaded now)
+# DO NOT import easyocr or torch here to save 300MB RAM! They are lazy-loaded.
 
 class FaceMatchRequest(BaseModel):
     registeredImage: str
@@ -37,6 +36,9 @@ async def extract_text(file: UploadFile = File(...)):
         global reader
         if reader is None:
             print("Lazy loading EasyOCR Model...")
+            import easyocr
+            import torch
+            torch.set_num_threads(1) # Save memory
             reader = easyocr.Reader(['en'])
             print("EasyOCR Model loaded.")
         
