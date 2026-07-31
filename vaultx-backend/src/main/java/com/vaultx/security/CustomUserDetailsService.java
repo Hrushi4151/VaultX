@@ -34,35 +34,42 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug("Loading UserDetails for: {}", username);
 
-        // Check if Admin exists
         Optional<Admin> adminOpt = adminRepository.findByEmail(username);
-        if (adminOpt.isPresent()) {
-            Admin admin = adminOpt.get();
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(admin.getEmail())
-                    .password(admin.getPasswordHash())
-                    .disabled(!admin.isActive())
-                    .accountLocked(!admin.isActive())
-                    .authorities(List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))
-                    .build();
+        Optional<User> userOpt = userRepository.findByEmailWithRoles(username)
+                .or(() -> userRepository.findByUsername(username));
+
+        if (adminOpt.isEmpty() && userOpt.isEmpty()) {
+            log.warn("User not found for identifier: {}", username);
+            throw new UsernameNotFoundException("User not found: " + username);
         }
 
-        // Check if regular User exists
-        User user = userRepository.findByEmailWithRoles(username)
-                .or(() -> userRepository.findByUsername(username))
-                .orElseThrow(() -> {
-                    log.warn("User not found for identifier: {}", username);
-                    return new UsernameNotFoundException("User not found: " + username);
-                });
+        List<org.springframework.security.core.GrantedAuthority> authorities = new java.util.ArrayList<>();
+        String password = "";
+        boolean active = false;
+        String finalUsername = username;
+
+        if (adminOpt.isPresent()) {
+            Admin admin = adminOpt.get();
+            password = admin.getPasswordHash();
+            active = admin.isActive();
+            finalUsername = admin.getEmail();
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            password = user.getPasswordHash(); // Prefer User password for Spring Security internals
+            active = active || user.isActive();
+            finalUsername = user.getEmail();
+            user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName().name())));
+        }
 
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPasswordHash())
-                .disabled(!user.isActive())
-                .accountLocked(!user.isActive())
-                .authorities(user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-                        .collect(Collectors.toList()))
+                .username(finalUsername)
+                .password(password)
+                .disabled(!active)
+                .accountLocked(!active)
+                .authorities(authorities)
                 .build();
     }
 }
