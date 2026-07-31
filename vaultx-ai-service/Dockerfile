@@ -23,12 +23,9 @@ COPY requirements.txt .
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Install CPU-only PyTorch
-RUN pip install --no-cache-dir \
-    torch torchvision \
-    --index-url https://download.pytorch.org/whl/cpu
-
-# Install remaining dependencies
+# ============================================
+# Install dependencies
+# ============================================
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ============================================
@@ -60,12 +57,9 @@ ENV OPENBLAS_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV NUMEXPR_NUM_THREADS=1
 
-# Railway provides PORT automatically
-ENV PORT=8080
-
 EXPOSE 8080
 
 # ============================================
 # Start FastAPI
 # ============================================
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
