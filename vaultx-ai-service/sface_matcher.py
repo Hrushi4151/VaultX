@@ -4,31 +4,44 @@ import cv2
 import numpy as np
 from fastapi import HTTPException
 
-def download_file(url, filepath):
-    if not os.path.exists(filepath):
-        print(f"Downloading {filepath}...")
-        urllib.request.urlretrieve(url, filepath)
+# Global models
+_detector = None
+_recognizer = None
 
-def get_face_features(img_cv2):
-    # Models are pre-downloaded via Dockerfile to /app/models
+def get_models(width, height):
+    global _detector, _recognizer
     yunet_path = "/app/models/face_detection_yunet_2023mar.onnx"
     sface_path = "/app/models/face_recognition_sface_2021dec.onnx"
     
-    # Fallback for local development (if not running in Docker)
+    # Fallback for local development
     if not os.path.exists(yunet_path) or not os.path.exists(sface_path):
         yunet_path = "models/face_detection_yunet_2023mar.onnx"
         sface_path = "models/face_recognition_sface_2021dec.onnx"
         if not os.path.exists(yunet_path):
             os.makedirs("models", exist_ok=True)
-            print("Downloading Yunet...")
             urllib.request.urlretrieve("https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx", yunet_path)
         if not os.path.exists(sface_path):
-            print("Downloading SFace...")
             urllib.request.urlretrieve("https://github.com/opencv/opencv_zoo/raw/main/models/face_recognition_sface/face_recognition_sface_2021dec.onnx", sface_path)
             
+    if _detector is None:
+        _detector = cv2.FaceDetectorYN.create(yunet_path, "", (width, height))
+    else:
+        _detector.setInputSize((width, height))
+        
+    if _recognizer is None:
+        _recognizer = cv2.FaceRecognizerSF.create(sface_path, "")
+        
+    return _detector, _recognizer
+
+def get_face_features(img_cv2):
+    # Resize image to save memory and avoid OOM (max dim 640)
+    h, w = img_cv2.shape[:2]
+    if max(w, h) > 640:
+        scale = 640 / max(w, h)
+        img_cv2 = cv2.resize(img_cv2, (int(w * scale), int(h * scale)))
+    
     height, width, _ = img_cv2.shape
-    detector = cv2.FaceDetectorYN.create(yunet_path, "", (width, height))
-    recognizer = cv2.FaceRecognizerSF.create(sface_path, "")
+    detector, recognizer = get_models(width, height)
     
     # Detect faces
     faces = detector.detect(img_cv2)
@@ -48,13 +61,9 @@ def is_match(img1_cv2, img2_cv2, threshold=0.363):
     feat2 = get_face_features(img2_cv2)
     
     if feat1 is None or feat2 is None:
-        raise HTTPException(status_code=400, detail="Face could not be detected in one or both images.")
+        raise ValueError("Face could not be detected in one or both images.")
         
-    sface_path = "/app/models/face_recognition_sface_2021dec.onnx"
-    if not os.path.exists(sface_path):
-        sface_path = "models/face_recognition_sface_2021dec.onnx"
-        
-    recognizer = cv2.FaceRecognizerSF.create(sface_path, "")
+    _, recognizer = get_models(320, 320) # Dimensions don't matter for recognizer match
     
     # Compute Cosine distance
     score = recognizer.match(feat1, feat2, cv2.FaceRecognizerSF_FR_COSINE)
