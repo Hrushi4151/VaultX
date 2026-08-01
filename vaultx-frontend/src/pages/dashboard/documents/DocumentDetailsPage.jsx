@@ -320,29 +320,32 @@ export default function DocumentDetailsPage() {
   }
 
   return (
-    <div className="h-full w-full max-w-full overflow-x-hidden flex flex-col space-y-4 sm:space-y-6 pb-8">
+  return (
+    <div className="h-full w-full min-w-0 overflow-x-hidden flex flex-col space-y-4 sm:space-y-6 pb-8">
       
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-3 sm:p-6 rounded-xl sm:rounded-3xl shadow-sm border border-gray-100 min-w-0">
+        
+        {/* Title & Back Button Area */}
+        <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full min-w-0">
           <button 
             onClick={() => navigate('/dashboard/documents')}
-            className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-50 rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-50 rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0 mt-1 sm:mt-0"
             title="Back to Documents"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </button>
           
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 font-bold">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 text-primary rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 font-bold hidden sm:flex">
             <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate leading-tight">{doc.displayName}</h1>
+          <div className="min-w-0 flex-1 flex flex-col">
+            <div className="flex items-center gap-2 w-full min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-gray-800 truncate leading-tight shrink">{doc.displayName}</h1>
               <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-1 text-gray-400 hover:text-primary transition-colors flex-shrink-0"
+                className="p-1 text-gray-400 hover:text-primary transition-colors shrink-0"
                 title="Edit Properties"
               >
                 <Edit3 className="w-4 h-4" />
@@ -355,53 +358,53 @@ export default function DocumentDetailsPage() {
         </div>
         
         {/* Quick Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap shrink-0 mt-2 xl:mt-0 w-full xl:w-auto">
           <button
             onClick={handleToggleFavourite}
-            className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
+            className={`flex-1 xl:flex-none justify-center p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
               doc.favourite 
                 ? 'bg-amber-50 text-amber-600 border-amber-200' 
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${doc.favourite ? 'fill-amber-400 text-amber-400' : ''}`} />
-            <span className="hidden sm:inline">{doc.favourite ? 'Fav' : 'Favourite'}</span>
+            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${doc.favourite ? 'fill-amber-400 text-amber-400' : ''}`} />
+            <span className="truncate">{doc.favourite ? 'Fav' : 'Favourite'}</span>
           </button>
 
           <button
             onClick={handleToggleArchive}
-            className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
+            className={`flex-1 xl:flex-none justify-center p-2 sm:p-2.5 rounded-lg sm:rounded-xl border transition-colors flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold ${
               doc.archived 
                 ? 'bg-purple-50 text-purple-600 border-purple-200' 
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <Archive className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">{doc.archived ? 'Unarchive' : 'Archive'}</span>
+            <Archive className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">{doc.archived ? 'Unarchive' : 'Archive'}</span>
           </button>
 
           {/* Single Unified AI Suggestions Button */}
           <button 
             onClick={handleOpenAiModal}
             disabled={isAnalyzing}
-            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white font-bold rounded-lg sm:rounded-xl transition-all shadow-md text-[10px] sm:text-xs flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 transform hover:scale-[1.02]"
+            className="flex-1 xl:flex-none justify-center px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-800 text-white font-bold rounded-lg sm:rounded-xl transition-all shadow-md text-[10px] sm:text-xs flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 transform hover:scale-[1.02] min-w-[120px]"
           >
-            <Sparkles className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300 ${isAnalyzing ? 'animate-spin' : ''}`} />
-            {isAnalyzing ? 'Analyzing...' : 'AI Suggestions'}
+            <Sparkles className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300 shrink-0 ${isAnalyzing ? 'animate-spin' : ''}`} />
+            <span className="truncate">{isAnalyzing ? 'Analyzing...' : 'AI Suggestions'}</span>
           </button>
 
           <button 
             onClick={handleDownload}
             disabled={isDownloading}
-            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-primary text-white font-bold rounded-lg sm:rounded-xl hover:bg-primary-dark transition-colors text-[10px] sm:text-xs flex items-center gap-1 sm:gap-1.5 shadow-sm disabled:opacity-70"
+            className="flex-1 xl:flex-none justify-center px-3 sm:px-4 py-2 sm:py-2.5 bg-primary text-white font-bold rounded-lg sm:rounded-xl hover:bg-primary-dark transition-colors text-[10px] sm:text-xs flex items-center gap-1 sm:gap-1.5 shadow-sm disabled:opacity-70"
           >
-            {isDownloading ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-            <span className="hidden sm:inline">Download</span>
+            {isDownloading ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />}
+            <span className="truncate hidden sm:inline">Download</span>
           </button>
 
           <button
             onClick={handleSoftDelete}
-            className="p-2 sm:p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg sm:rounded-xl transition-colors border border-red-100"
+            className="p-2 sm:p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg sm:rounded-xl transition-colors border border-red-100 shrink-0"
             title="Move to Trash"
           >
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -411,97 +414,97 @@ export default function DocumentDetailsPage() {
 
       {/* Popup AI Suggestions Modal */}
       {isAiModalOpen && aiAnalysis && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 text-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-4xl w-full relative overflow-hidden border border-purple-500/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+          <div className="bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 text-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full relative border border-purple-500/30 flex flex-col my-auto max-h-[95vh]">
             
             {/* Close Button */}
             <button 
               onClick={() => setIsAiModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10 shrink-0"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none hidden sm:block">
               <Sparkles className="w-64 h-64 text-purple-300" />
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-white/10 pb-5 pr-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6 border-b border-white/10 pb-4 sm:pb-5 pr-8 sm:pr-10 shrink-0">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-purple-500/30 backdrop-blur-md rounded-2xl border border-purple-400/30">
+                <div className="hidden sm:flex p-3 bg-purple-500/30 backdrop-blur-md rounded-2xl border border-purple-400/30 shrink-0">
                   <Wand2 className="w-7 h-7 text-purple-300" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold flex items-center gap-2">
+                  <h2 className="text-base sm:text-xl font-bold flex flex-wrap items-center gap-2">
                     VaultX AI Smart Suggestions
-                    <span className="px-2.5 py-0.5 text-xs bg-purple-500/30 text-purple-200 rounded-full font-semibold border border-purple-400/30">
-                      {Math.round((aiAnalysis.confidenceScore || 0.96) * 100)}% Confidence
+                    <span className="px-2 py-0.5 text-[10px] sm:text-xs bg-purple-500/30 text-purple-200 rounded-full font-semibold border border-purple-400/30">
+                      {Math.round((aiAnalysis.confidenceScore || 0.96) * 100)}% Conf
                     </span>
                   </h2>
-                  <p className="text-xs text-purple-200/80 mt-1">
+                  <p className="text-[11px] sm:text-xs text-purple-200/80 mt-1 line-clamp-2">
                     {aiAnalysis.summaryText}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button
                   onClick={handleReprocessAI}
                   disabled={isAnalyzing || isApplyingAi}
-                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/40 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/40 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
                   title="Reprocess OCR & AI Engine to analyze document again"
                 >
-                  <RotateCw className={`w-4 h-4 text-purple-300 ${isAnalyzing ? 'animate-spin' : ''}`} />
-                  {isAnalyzing ? 'Reprocessing AI...' : 'Reprocess with AI'}
+                  <RotateCw className={`w-3.5 h-3.5 text-purple-300 shrink-0 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">{isAnalyzing ? 'Reprocessing...' : 'Reprocess'}</span>
                 </button>
 
                 <button
                   onClick={handleApplyAllSuggestions}
                   disabled={isApplyingAi || isAnalyzing}
-                  className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-xs rounded-xl transition-all shadow-lg flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  {isApplyingAi ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                  Apply All AI Suggestions
+                  {isApplyingAi ? <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Sparkles className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="truncate">Apply All</span>
                 </button>
               </div>
             </div>
 
             {/* Grid of AI Suggestions */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 my-2">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 my-2 overflow-y-auto pr-1 min-h-0">
               
               {/* Suggested Name (Editable Input) */}
-              <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div className="p-3 sm:p-4 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 flex flex-col justify-between shrink-0">
                 <div>
-                  <span className="text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
                     Suggested Name
                   </span>
                   <input
                     type="text"
                     value={customAiName}
                     onChange={(e) => setCustomAiName(e.target.value)}
-                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400"
+                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-lg sm:rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400"
                     placeholder="Document name..."
                   />
                 </div>
                 <button
                   onClick={() => handleApplySingleSuggestion({ suggestedName: customAiName }, 'Applied suggested name!')}
                   disabled={isApplyingAi}
-                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1"
+                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold transition-colors flex items-center justify-center gap-1"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Apply Name
+                  <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" /> Apply Name
                 </button>
               </div>
 
               {/* Suggested Category (Select Dropdown) */}
-              <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div className="p-3 sm:p-4 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 flex flex-col justify-between shrink-0">
                 <div>
-                  <span className="text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
                     Suggested Category
                   </span>
                   <select
                     value={customAiCategory}
                     onChange={(e) => setCustomAiCategory(e.target.value)}
-                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
+                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-lg sm:rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
                   >
                     {categories.length > 0 ? (
                       categories.map(cat => (
@@ -521,16 +524,16 @@ export default function DocumentDetailsPage() {
                 <button
                   onClick={() => handleApplySingleSuggestion({ categoryName: customAiCategory }, 'Applied category!')}
                   disabled={isApplyingAi}
-                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1"
+                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold transition-colors flex items-center justify-center gap-1"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Apply Category
+                  <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" /> Apply Category
                 </button>
               </div>
 
               {/* Suggested Collection with Multi-Collection Dropdown */}
-              <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div className="p-3 sm:p-4 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 flex flex-col justify-between shrink-0">
                 <div>
-                  <span className="text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
                     Target Collection
                   </span>
 
@@ -540,7 +543,7 @@ export default function DocumentDetailsPage() {
                       setCustomAiCollection(e.target.value);
                       setSelectedCollectionForAi(e.target.value);
                     }}
-                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
+                    className="w-full text-xs font-bold text-white bg-purple-950/80 border border-purple-400/40 rounded-lg sm:rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
                   >
                     {aiAnalysis.suggestedCollectionNames?.map((colName, idx) => (
                       <option key={idx} value={colName} className="bg-slate-900 text-white font-medium py-1">
@@ -552,26 +555,26 @@ export default function DocumentDetailsPage() {
                 <button
                   onClick={() => handleApplySingleSuggestion({ collectionName: customAiCollection || selectedCollectionForAi }, 'Added to collection!')}
                   disabled={isApplyingAi}
-                  className="mt-3 w-full py-1.5 bg-indigo-500/40 hover:bg-indigo-500/60 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1"
+                  className="mt-3 w-full py-1.5 bg-indigo-500/40 hover:bg-indigo-500/60 text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold transition-colors flex items-center justify-center gap-1"
                 >
-                  <FolderPlus className="w-3.5 h-3.5" /> Add to Collection
+                  <FolderPlus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" /> Add to Collection
                 </button>
               </div>
 
               {/* Suggested Tags (Editable Tags) */}
-              <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div className="p-3 sm:p-4 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/10 flex flex-col justify-between shrink-0">
                 <div>
-                  <span className="text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">
                     Suggested Smart Tags
                   </span>
-                  <div className="flex flex-wrap gap-1 mb-1.5 max-h-16 overflow-y-auto">
+                  <div className="flex flex-wrap gap-1 mb-1.5 max-h-20 sm:max-h-16 overflow-y-auto">
                     {customAiTags.map((t, idx) => (
                       <span key={idx} className="px-1.5 py-0.5 bg-purple-500/30 text-purple-100 rounded text-[10px] font-medium border border-purple-400/20 flex items-center gap-1">
                         {t}
                         <button 
                           type="button"
                           onClick={() => setCustomAiTags(tags => tags.filter((_, i) => i !== idx))}
-                          className="text-purple-300 hover:text-white font-bold ml-0.5"
+                          className="text-purple-300 hover:text-white font-bold ml-0.5 shrink-0"
                         >
                           ×
                         </button>
@@ -599,40 +602,40 @@ export default function DocumentDetailsPage() {
                 <button
                   onClick={() => handleApplySingleSuggestion({ tags: customAiTags }, 'Applied AI smart tags!')}
                   disabled={isApplyingAi}
-                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1"
+                  className="mt-3 w-full py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-semibold transition-colors flex items-center justify-center gap-1"
                 >
-                  <Tag className="w-3.5 h-3.5" /> Apply Tags
+                  <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" /> Apply Tags
                 </button>
               </div>
 
             </div>
 
             {/* Modal Bottom Action Footer */}
-            <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/10">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-white/10 shrink-0 gap-3 sm:gap-0">
               <button
                 onClick={() => setIsAiModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-purple-300 hover:text-white transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-purple-300 hover:text-white transition-colors bg-white/5 sm:bg-transparent rounded-lg sm:rounded-none border border-white/10 sm:border-none w-full sm:w-auto"
               >
                 Cancel
               </button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleReprocessAI}
                   disabled={isAnalyzing || isApplyingAi}
-                  className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 sm:flex-none justify-center px-4 py-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  <RotateCw className={`w-3.5 h-3.5 ${isAnalyzing ? 'animate-spin' : ''}`} />
-                  {isAnalyzing ? 'Reprocessing AI...' : 'Reprocess with AI'}
+                  <RotateCw className={`w-3.5 h-3.5 shrink-0 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                  <span>{isAnalyzing ? 'Reprocessing AI...' : 'Reprocess with AI'}</span>
                 </button>
 
                 <button
                   onClick={handleApplyAllSuggestions}
                   disabled={isApplyingAi || isAnalyzing}
-                  className="px-5 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 sm:flex-none justify-center px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  {isApplyingAi ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                  Apply All AI Suggestions
+                  {isApplyingAi ? <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Sparkles className="w-3.5 h-3.5 shrink-0" />}
+                  <span>Apply All AI Suggestions</span>
                 </button>
               </div>
             </div>
@@ -641,18 +644,18 @@ export default function DocumentDetailsPage() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 min-w-0">
         
         {/* Left Column: Preview & OCR Extracted Text */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6 min-w-0">
           
           {/* Document Preview Box */}
-          <div className="bg-white p-2 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 h-[350px] sm:h-[450px] lg:h-[520px] flex items-center justify-center bg-gray-50/50 overflow-hidden relative">
+          <div className="bg-white p-2 sm:p-4 rounded-xl sm:rounded-3xl shadow-sm border border-gray-100 h-[400px] sm:h-[450px] lg:h-[520px] flex items-center justify-center bg-gray-50/50 overflow-hidden relative w-full min-w-0 max-w-full">
             {previewUrl ? (
               doc.mimeType?.startsWith('image/') ? (
-                <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden group">
+                <div className="relative w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-lg sm:rounded-2xl overflow-hidden group">
                   {/* Toolbar overlay */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-xl p-1.5 sm:p-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-md rounded-xl p-1.5 sm:p-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 scale-90 sm:scale-100">
                     <button onClick={() => setImgScale(s => s + 0.25)} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom In"><ZoomIn className="w-4 h-4"/></button>
                     <button onClick={() => setImgScale(s => Math.max(0.25, s - 0.25))} className="p-1.5 sm:p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors" title="Zoom Out"><ZoomOut className="w-4 h-4"/></button>
                     <div className="w-px h-5 bg-white/20 mx-1"></div>
@@ -670,11 +673,11 @@ export default function DocumentDetailsPage() {
                   />
                 </div>
               ) : doc.mimeType === 'application/pdf' ? (
-                <iframe src={previewUrl} title={doc.displayName} className="w-full h-full border-none rounded-xl sm:rounded-2xl" />
+                <iframe src={previewUrl} title={doc.displayName} className="w-full h-full max-w-full border-none rounded-lg sm:rounded-2xl" />
               ) : null
             ) : previewError ? (
               <div className="text-center text-gray-400 p-4">
-                <FileWarning className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 text-gray-300" />
+                <FileWarning className="w-10 h-10 sm:w-16 sm:h-16 mx-auto mb-3 text-gray-300" />
                 <p className="font-medium text-gray-700 text-sm sm:text-base">Preview not available for this file type</p>
                 <p className="text-xs mt-1 text-gray-400">Click download to inspect file contents.</p>
               </div>
@@ -687,21 +690,21 @@ export default function DocumentDetailsPage() {
           </div>
 
           {/* Mobile OCR Toggle Button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden w-full">
             <button 
               onClick={() => setShowOcrMobile(!showOcrMobile)}
-              className="w-full py-3.5 bg-blue-50/50 hover:bg-blue-50 text-blue-600 rounded-2xl font-bold flex items-center justify-center gap-2 border border-blue-100 transition-colors shadow-sm"
+              className="w-full py-3 bg-blue-50/50 hover:bg-blue-50 text-blue-600 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 border border-blue-100 transition-colors shadow-sm text-sm"
             >
-              <Search className="w-4 h-4"/> 
-              {showOcrMobile ? "Hide OCR Extracted Text" : "View Extracted OCR Text"}
+              <Search className="w-4 h-4 shrink-0"/> 
+              <span className="truncate">{showOcrMobile ? "Hide OCR Extracted Text" : "View Extracted OCR Text"}</span>
             </button>
           </div>
 
           {/* OCR Extracted Text */}
-          <div className={`bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 ${showOcrMobile ? 'block' : 'hidden lg:block'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-800 text-base sm:text-lg flex items-center gap-2">
-                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500"/> OCR Text Extraction
+          <div className={`bg-white p-4 sm:p-6 rounded-xl sm:rounded-3xl shadow-sm border border-gray-100 min-w-0 ${showOcrMobile ? 'block' : 'hidden lg:block'}`}>
+            <div className="flex flex-wrap items-center justify-between mb-3 sm:mb-4 gap-2">
+              <h2 className="font-bold text-gray-800 text-sm sm:text-lg flex items-center gap-2 shrink-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 shrink-0"/> OCR Text Extraction
               </h2>
               <button 
                 onClick={() => {
@@ -711,14 +714,14 @@ export default function DocumentDetailsPage() {
                   setTimeout(() => setCopiedOcr(false), 2000);
                   toast.success('OCR text copied!');
                 }}
-                className="px-3 py-1 text-[10px] sm:text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-1 transition-colors"
+                className="px-2.5 sm:px-3 py-1.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-1 transition-colors shrink-0"
               >
-                {copiedOcr ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedOcr ? <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
                 {copiedOcr ? 'Copied' : 'Copy Text'}
               </button>
             </div>
             
-            <div className="bg-gray-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 h-40 sm:h-52 overflow-y-auto text-xs sm:text-sm text-gray-700 font-mono whitespace-pre-wrap leading-relaxed">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-200 h-40 sm:h-52 overflow-y-auto text-[11px] sm:text-sm text-gray-700 font-mono whitespace-pre-wrap break-words leading-relaxed w-full min-w-0">
               [VaultX OCR Engine - Extracted Text]{"\n\n"}
               {aiAnalysis?.ocrText || "Text extracted using VaultX OCR engine. Full-text search active."}
             </div>
@@ -727,17 +730,17 @@ export default function DocumentDetailsPage() {
         </div>
 
         {/* Right Column: Editable Properties & AI Insights */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 min-w-0">
 
           {/* Editable Document Properties Card */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-primary" /> Document Properties
+          <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-3xl shadow-sm border border-gray-100 min-w-0">
+            <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+              <h2 className="font-bold text-gray-800 text-base sm:text-lg flex items-center gap-2 shrink-0">
+                <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" /> Document Properties
               </h2>
               <button 
                 onClick={() => setIsEditing(!isEditing)}
-                className="text-xs font-semibold text-primary hover:underline"
+                className="text-[11px] sm:text-xs font-semibold text-primary hover:underline shrink-0 px-2 py-1 bg-primary/5 rounded-md"
               >
                 {isEditing ? 'Cancel Edit' : 'Edit'}
               </button>
@@ -746,17 +749,17 @@ export default function DocumentDetailsPage() {
             <form onSubmit={handleSaveChanges} className="space-y-4">
               {/* File Name */}
               <div>
-                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Display Name</label>
+                <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase mb-1">Display Name</label>
                 {isEditing ? (
                   <input 
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
+                    className="w-full px-3 py-2 text-[13px] sm:text-sm bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
                     placeholder="Enter document name..."
                   />
                 ) : (
-                  <p className="text-sm font-semibold text-gray-800 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100">
+                  <p className="text-[13px] sm:text-sm font-semibold text-gray-800 bg-gray-50 px-3 py-2 rounded-lg sm:rounded-xl border border-gray-100 break-words">
                     {doc.displayName}
                   </p>
                 )}
@@ -764,12 +767,12 @@ export default function DocumentDetailsPage() {
 
               {/* Category */}
               <div>
-                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
                 {isEditing ? (
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
+                    className="w-full px-3 py-2 text-[13px] sm:text-sm bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
                   >
                     <option value="">Select Category...</option>
                     {categories.map(cat => (
@@ -777,44 +780,44 @@ export default function DocumentDetailsPage() {
                     ))}
                   </select>
                 ) : (
-                  <div className="flex items-center gap-2 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: doc.category?.colorHex || doc.category?.color || '#9ca3af' }} />
-                    <span className="text-sm font-medium text-gray-800">{doc.category?.name || 'Uncategorized'}</span>
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg sm:rounded-xl border border-gray-100 truncate">
+                    <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: doc.category?.colorHex || doc.category?.color || '#9ca3af' }} />
+                    <span className="text-[13px] sm:text-sm font-medium text-gray-800 truncate">{doc.category?.name || 'Uncategorized'}</span>
                   </div>
                 )}
               </div>
 
               {/* Expiry Date */}
               <div>
-                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Expiration Date</label>
+                <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase mb-1">Expiration Date</label>
                 {isEditing ? (
                   <input 
                     type="date"
                     value={expiryDate}
                     onChange={(e) => setExpiryDate(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
+                    className="w-full px-3 py-2 text-[13px] sm:text-sm bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
                   />
                 ) : (
-                  <div className="flex items-center gap-2 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 text-sm font-medium text-gray-800">
-                    <Calendar className="w-4 h-4 text-red-500" />
-                    <span>{expiryDate ? expiryDate : 'No expiration date set'}</span>
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg sm:rounded-xl border border-gray-100 text-[13px] sm:text-sm font-medium text-gray-800 truncate">
+                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500 shrink-0" />
+                    <span className="truncate">{expiryDate ? expiryDate : 'No expiration date set'}</span>
                   </div>
                 )}
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Description / Notes</label>
+                <label className="block text-[10px] sm:text-xs font-bold text-gray-600 uppercase mb-1">Description / Notes</label>
                 {isEditing ? (
                   <textarea 
                     rows={3}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
+                    className="w-full px-3 py-2 text-[13px] sm:text-sm bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium text-gray-800"
                     placeholder="Add notes or details..."
                   />
                 ) : (
-                  <p className="text-sm text-gray-600 bg-gray-50 px-3.5 py-2.5 rounded-xl border border-gray-100 italic min-h-[60px]">
+                  <p className="text-[13px] sm:text-sm text-gray-600 bg-gray-50 px-3 py-2.5 rounded-lg sm:rounded-xl border border-gray-100 italic min-h-[60px] break-words">
                     {doc.description || 'No description provided.'}
                   </p>
                 )}
@@ -825,9 +828,9 @@ export default function DocumentDetailsPage() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                  className="w-full py-2 sm:py-2.5 bg-primary text-white rounded-lg sm:rounded-xl font-bold text-[13px] sm:text-sm hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                 >
-                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {isSaving ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />}
                   Save Property Changes
                 </button>
               )}
@@ -835,23 +838,23 @@ export default function DocumentDetailsPage() {
           </div>
 
           {/* AI Insights Card */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-              <Bot className="w-5 h-5 text-purple-500"/> AI Document Insights
+          <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-3xl shadow-sm border border-gray-100 min-w-0">
+            <h2 className="font-bold text-gray-800 text-base sm:text-lg mb-3 sm:mb-4 flex items-center gap-2">
+              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 shrink-0"/> AI Document Insights
             </h2>
             
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-50 pb-3">
-                <span className="text-gray-500 text-sm font-medium">Detected Type</span>
-                <span className="font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-lg text-xs">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-50 pb-3 gap-1 sm:gap-0">
+                <span className="text-gray-500 text-[11px] sm:text-sm font-medium">Detected Type</span>
+                <span className="font-bold text-purple-700 bg-purple-50 px-2 sm:px-3 py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs truncate max-w-full inline-block text-center sm:text-right">
                   {aiAnalysis?.suggestedType || 'Generic Document'}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-50 pb-3">
-                <span className="text-gray-500 text-sm font-medium">AI Confidence</span>
-                <span className="font-bold text-emerald-600 flex items-center gap-1 text-xs bg-emerald-50 px-2.5 py-1 rounded-lg">
-                  <CheckCircle className="w-3.5 h-3.5"/> {Math.round((aiAnalysis?.confidenceScore || 0.96) * 100)}% Match
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-50 pb-3 gap-1 sm:gap-0">
+                <span className="text-gray-500 text-[11px] sm:text-sm font-medium">AI Confidence</span>
+                <span className="font-bold text-emerald-600 flex items-center justify-center sm:justify-end gap-1 text-[10px] sm:text-xs bg-emerald-50 px-2 sm:px-2.5 py-1 rounded-md sm:rounded-lg shrink-0">
+                  <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0"/> {Math.round((aiAnalysis?.confidenceScore || 0.96) * 100)}% Match
                 </span>
               </div>
             </div>
