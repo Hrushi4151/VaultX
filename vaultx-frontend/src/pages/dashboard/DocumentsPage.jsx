@@ -163,7 +163,7 @@ export default function DocumentsPage() {
           setViewMode={setViewMode}
           onAction={handleAction}
           isLoading={isLoading}
-          title="All Documents"
+          title={selectedCategory ? categories.find(c => c.id === selectedCategory)?.name || "All Documents" : "All Documents"}
         />
       </div>
 

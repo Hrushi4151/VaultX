@@ -17,6 +17,7 @@ export default function DocumentExplorer({
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenu, setActiveMenu] = useState(null);
+  const [sortBy, setSortBy] = useState('date_desc');
 
   const formatSize = (bytes) => {
     if (bytes === 0) return '0 B';
@@ -38,39 +39,67 @@ export default function DocumentExplorer({
     doc.displayName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const sortedDocs = [...filteredDocs].sort((a, b) => {
+    switch (sortBy) {
+      case 'name_asc': return a.displayName.localeCompare(b.displayName);
+      case 'name_desc': return b.displayName.localeCompare(a.displayName);
+      case 'size_asc': return a.fileSize - b.fileSize;
+      case 'size_desc': return b.fileSize - a.fileSize;
+      case 'date_asc': return new Date(a.updatedAt) - new Date(b.updatedAt);
+      case 'date_desc':
+      default: return new Date(b.updatedAt) - new Date(a.updatedAt);
+    }
+  });
+
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{title}</h1>
         
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search documents..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all shadow-xs font-medium"
             />
           </div>
           
-          <div className="flex items-center bg-white border border-gray-200 rounded-xl shadow-xs p-1 shrink-0">
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-gray-600'}`}
-              title="Grid View"
+          <div className="flex items-center gap-2.5">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-xs cursor-pointer appearance-none min-w-[110px]"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
             >
-              <Grid className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-gray-600'}`}
-              title="List View"
-            >
-              <ListIcon className="w-4 h-4" />
-            </button>
+              <option value="date_desc">Newest</option>
+              <option value="date_asc">Oldest</option>
+              <option value="name_asc">Name (A-Z)</option>
+              <option value="name_desc">Name (Z-A)</option>
+              <option value="size_desc">Largest</option>
+              <option value="size_asc">Smallest</option>
+            </select>
+
+            <div className="flex items-center bg-white border border-gray-200 rounded-xl shadow-xs p-1 shrink-0">
+              <button 
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Grid View"
+              >
+                <Grid className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-gray-600'}`}
+                title="List View"
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -80,7 +109,7 @@ export default function DocumentExplorer({
         <div className="flex-1 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
-      ) : filteredDocs.length === 0 ? (
+      ) : sortedDocs.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-white border border-dashed border-gray-200 rounded-2xl">
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
             <File className="w-8 h-8 text-gray-300" />
@@ -106,7 +135,7 @@ export default function DocumentExplorer({
             </div>
           )}
 
-          {filteredDocs.map(doc => (
+          {sortedDocs.map(doc => (
             viewMode === 'grid' ? (
               <div 
                 key={doc.id} 
