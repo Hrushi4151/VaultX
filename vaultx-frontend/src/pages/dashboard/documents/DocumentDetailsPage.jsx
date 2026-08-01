@@ -11,6 +11,7 @@ import documentService from '../../../services/documentService';
 import engineService from '../../../services/engineService';
 import aiService from '../../../services/aiService';
 import toast from 'react-hot-toast';
+import PdfViewer from '../../../components/documents/PdfViewer';
 
 export default function DocumentDetailsPage() {
   const { id } = useParams();
@@ -672,22 +673,7 @@ export default function DocumentDetailsPage() {
                   />
                 </div>
               ) : doc.mimeType === 'application/pdf' ? (
-                /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
-                  <div className="flex flex-col items-center justify-center h-full w-full bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
-                    <FileText className="w-16 h-16 text-red-400 mb-4" />
-                    <h3 className="text-lg font-bold text-gray-800 mb-2">PDF Document</h3>
-                    <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">Your mobile browser doesn't support inline PDF previews.</p>
-                    <button 
-                      onClick={handleDownload}
-                      className="px-6 py-3 bg-primary text-white rounded-xl font-bold flex items-center gap-2 shadow-sm hover:bg-primary-dark transition-colors"
-                    >
-                      <Download className="w-5 h-5" />
-                      Download to View
-                    </button>
-                  </div>
-                ) : (
-                  <iframe src={previewUrl} title={doc.displayName} className="w-full h-full max-w-full border-none rounded-lg sm:rounded-2xl" />
-                )
+                <PdfViewer fileUrl={previewUrl} displayName={doc.displayName} />
               ) : null
             ) : previewError ? (
               <div className="text-center text-gray-400 p-4">
