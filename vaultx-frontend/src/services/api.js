@@ -88,7 +88,10 @@ api.interceptors.response.use(
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem('vaultx_user');
         localStorage.removeItem('vaultx_refresh_token');
-        if (!window.location.pathname.includes('/login')) {
+        if (
+          !window.location.pathname.includes('/login') && 
+          (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))
+        ) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
@@ -102,7 +105,10 @@ api.interceptors.response.use(
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem('vaultx_user');
         localStorage.removeItem('vaultx_refresh_token');
-        if (!window.location.pathname.includes('/login')) {
+        if (
+            !window.location.pathname.includes('/login') && 
+            (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))
+        ) {
             window.location.href = '/login';
         }
     }

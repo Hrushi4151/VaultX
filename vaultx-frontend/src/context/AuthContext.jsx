@@ -36,7 +36,10 @@ export function AuthProvider({ children }) {
           localStorage.removeItem(USER_KEY);
           localStorage.removeItem(TOKEN_KEY);
           localStorage.removeItem(REFRESH_TOKEN_KEY);
-          if (!window.location.pathname.includes('/login')) {
+          if (
+            !window.location.pathname.includes('/login') && 
+            (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))
+          ) {
             window.location.href = '/login';
           }
         }
