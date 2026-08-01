@@ -104,9 +104,24 @@ export default function DocumentPreviewModal({ isOpen, onClose, document, onDown
                <img src={previewBlobUrl} alt={document.displayName} className="max-w-full max-h-full object-contain" />
             </div>
           ) : isPdf && previewBlobUrl ? (
-            <div className="w-full h-full bg-white rounded shadow-sm overflow-hidden">
-              <iframe src={previewBlobUrl} className="w-full h-full border-0" title={document.displayName} />
-            </div>
+            /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+              <div className="text-center p-8 bg-white rounded-xl shadow-sm w-full h-full flex flex-col items-center justify-center">
+                <FileText className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-800 mb-1">PDF Document</h3>
+                <p className="text-gray-500 mb-6 text-sm max-w-xs mx-auto">Mobile browsers do not support inline PDF preview.</p>
+                <button 
+                  onClick={() => onDownload(document)}
+                  className="px-6 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors inline-flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download to View
+                </button>
+              </div>
+            ) : (
+              <div className="w-full h-full bg-white rounded shadow-sm overflow-hidden">
+                <iframe src={previewBlobUrl} className="w-full h-full border-0" title={document.displayName} />
+              </div>
+            )
           ) : (
             <div className="text-center p-8 bg-white rounded-xl shadow-sm">
               <File className="w-16 h-16 text-gray-300 mx-auto mb-4" />
