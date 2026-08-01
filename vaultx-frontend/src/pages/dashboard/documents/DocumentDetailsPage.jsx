@@ -320,7 +320,6 @@ export default function DocumentDetailsPage() {
   }
 
   return (
-  return (
     <div className="h-full w-full min-w-0 overflow-x-hidden flex flex-col space-y-4 sm:space-y-6 pb-8">
       
       {/* Header Bar */}
