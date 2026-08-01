@@ -50,8 +50,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // Check if error is 401 and it's not a retry or auth endpoint
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/')) {
+    // Check if error is 401 and it's not a retry, auth endpoint, or public endpoint
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/') && !originalRequest.url.includes('/public/')) {
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({resolve, reject});
@@ -98,7 +98,7 @@ api.interceptors.response.use(
     }
     
     // Handle 403 Forbidden (expired or invalidated token)
-    if ((error.response?.status === 403 || error.response?.status === 401) && !originalRequest.url.includes('/auth/')) {
+    if ((error.response?.status === 403 || error.response?.status === 401) && !originalRequest.url.includes('/auth/') && !originalRequest.url.includes('/public/')) {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem('vaultx_user');
         localStorage.removeItem('vaultx_refresh_token');
