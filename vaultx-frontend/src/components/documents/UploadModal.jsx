@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { UploadCloud, X, File, CheckCircle, AlertCircle, XCircle, Sparkles, Folder, Tag, Check, RotateCw } from 'lucide-react';
+import { UploadCloud, X, File, CheckCircle, AlertCircle, XCircle, Sparkles, Folder, Tag, Check, RotateCw, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import documentService from "../../services/documentService";
 import aiService from "../../services/aiService";
@@ -13,14 +13,13 @@ const ALLOWED_TYPES = [
 ];
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-
-
 export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [aiModalFileId, setAiModalFileId] = useState(null);
   const fileInputRef = useRef(null);
+  const captureInputRef = useRef(null);
 
   const validateFile = (file) => {
     if (!ALLOWED_TYPES.includes(file.type) && !file.name.endsWith('.docx') && !file.name.endsWith('.xlsx')) {
@@ -48,7 +47,15 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
         aiApplied: false
       };
     });
+    
     setFiles(prev => [...prev, ...fileObjects]);
+
+    // Auto-scan files directly upon selection
+    fileObjects.forEach(fObj => {
+      if (!fObj.error) {
+        applyAiToFile(fObj.id, fObj.file);
+      }
+    });
   };
 
   const onDrag = useCallback((e) => {
@@ -104,13 +111,14 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
     toast.success('✨ Applied AI suggestions to all selected documents!', { id: 'ai-analyze-all' });
   };
 
-  const applyAiToFile = async (fileId) => {
+  const applyAiToFile = async (fileId, directFile = null) => {
     const fileObj = files.find(f => f.id === fileId);
-    if (!fileObj) return;
+    const fileToAnalyze = directFile || fileObj?.file;
+    if (!fileToAnalyze) return;
 
-    toast.loading('Analyzing document with AI...', { id: 'ai-analyze-single' });
+    toast.loading(`Scanning ${fileToAnalyze.name}...`, { id: `ai-analyze-${fileId}` });
     try {
-      const res = await aiService.analyzePreview(fileObj.file);
+      const res = await aiService.analyzePreview(fileToAnalyze);
       const ai = res.data;
       setFiles(prev => prev.map(f => {
         if (f.id !== fileId) return f;
@@ -124,10 +132,10 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
           aiApplied: true
         };
       }));
-      toast.success('✨ AI suggestions applied to file!', { id: 'ai-analyze-single' });
+      toast.success('✨ Auto-scanned document and applied suggestions!', { id: `ai-analyze-${fileId}` });
     } catch (err) {
       console.error('Failed to analyze file', err);
-      toast.error('Failed to generate AI suggestions', { id: 'ai-analyze-single' });
+      toast.error('Failed to scan document', { id: `ai-analyze-${fileId}` });
       throw err; // throw so handleOpenAiModal can catch it
     }
   };
@@ -242,7 +250,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
           
           {/* Drag & Drop Zone */}
           <div 
-            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer
+            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer relative
               ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'}`}
             onDragEnter={onDrag}
             onDragLeave={onDrag}
@@ -254,11 +262,30 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
               <UploadCloud className="w-8 h-8 text-primary" />
             </div>
             <p className="text-gray-800 font-medium mb-1">Click to upload or drag and drop</p>
-            <p className="text-sm text-gray-500">PDF, Images, Office Docs, ZIP (max. 100MB)</p>
+            <p className="text-sm text-gray-500 mb-4">PDF, Images, Office Docs, ZIP (max. 100MB)</p>
+            
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                captureInputRef.current?.click();
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:border-primary hover:text-primary text-gray-700 rounded-lg text-sm font-medium transition-all shadow-sm z-10"
+            >
+              <Camera className="w-4 h-4" /> Capture Document
+            </button>
+
             <input 
               ref={fileInputRef}
               type="file" 
               multiple 
+              className="hidden" 
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <input 
+              ref={captureInputRef}
+              type="file" 
+              accept="image/*"
+              capture="environment"
               className="hidden" 
               onChange={(e) => handleFiles(e.target.files)}
             />
