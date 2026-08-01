@@ -219,30 +219,30 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
   const activeAi = activeAiFileObj?.aiAnalysis || null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[90vh] relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[95vh] sm:max-h-[90vh] relative">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Upload Documents</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Select and optimize files before uploading</p>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">Upload Documents</h2>
+            <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">Select and optimize files before uploading</p>
           </div>
           <button 
             onClick={onClose}
             disabled={uploading}
-            className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
+            className="p-1.5 sm:p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto">
+        <div className="p-4 sm:p-6 overflow-y-auto">
           
           {/* Drag & Drop Zone */}
           <div 
-            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer
+            className={`border-2 border-dashed rounded-xl p-6 sm:p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer
               ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'}`}
             onDragEnter={onDrag}
             onDragLeave={onDrag}
@@ -250,11 +250,11 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <UploadCloud className="w-8 h-8 text-primary" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3 sm:mb-4">
+              <UploadCloud className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
             </div>
-            <p className="text-gray-800 font-medium mb-1">Click to upload or drag and drop</p>
-            <p className="text-sm text-gray-500">PDF, Images, Office Docs, ZIP (max. 100MB)</p>
+            <p className="text-gray-800 font-medium mb-1 text-sm sm:text-base">Click to upload or drag and drop</p>
+            <p className="text-xs sm:text-sm text-gray-500">PDF, Images, Office Docs, ZIP (max. 100MB)</p>
             <input 
               ref={fileInputRef}
               type="file" 
@@ -267,17 +267,18 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
           {/* File List Header & Bulk AI Button */}
           {files.length > 0 && (
             <div className="mt-6 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <h3 className="font-semibold text-gray-700 text-sm">Selected Files ({files.length})</h3>
                 
                 <button
                   onClick={applyAiToAllFiles}
                   disabled={uploading}
-                  className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
+                  className="w-full sm:w-auto justify-center px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
                   title="Apply AI suggestions to all selected files in queue"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                  Apply AI Suggestions to All ({files.length})
+                  <span className="hidden sm:inline">Apply AI Suggestions to All ({files.length})</span>
+                  <span className="sm:hidden">Apply AI to All ({files.length})</span>
                 </button>
               </div>
 
@@ -295,7 +296,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                           {f.customName || f.file.name}
                         </p>
                         
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 ml-2">
                           {/* Dedicated AI Suggestion Icon Button per file */}
                           {f.status === 'pending' && (
                             <button
@@ -303,7 +304,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                                 e.stopPropagation();
                                 handleOpenAiModal(f.id);
                               }}
-                              className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1 transition-all ${
+                              className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-medium flex items-center gap-1 transition-all shrink-0 ${
                                 f.aiApplied 
                                   ? 'bg-purple-100 text-purple-800 border border-purple-300 shadow-xs' 
                                   : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 hover:shadow-sm'
@@ -311,7 +312,11 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                               title="Open AI Suggestions for this file"
                             >
                               <Sparkles className="w-3 h-3 text-purple-600" />
-                              {f.aiApplied ? 'AI Suggestions Applied' : 'AI Suggestions'}
+                              {f.aiApplied ? (
+                                <><span className="hidden sm:inline">AI Suggestions Applied</span><span className="sm:hidden">Applied</span></>
+                              ) : (
+                                <><span className="hidden sm:inline">AI Suggestions</span><span className="sm:hidden">AI</span></>
+                              )}
                             </button>
                           )}
 
@@ -367,34 +372,36 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 flex items-center justify-between gap-3 bg-gray-50/50 rounded-b-2xl">
+        <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 sm:gap-3 bg-gray-50/50 rounded-b-2xl">
           {files.length > 0 ? (
-            <button 
-              onClick={applyAiToAllFiles}
-              disabled={uploading}
-              className="text-xs font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1 transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5" /> Apply AI to All ({files.length})
-            </button>
-          ) : <div />}
+            <div className="flex justify-center sm:justify-start w-full sm:w-auto">
+              <button 
+                onClick={applyAiToAllFiles}
+                disabled={uploading}
+                className="text-xs font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Apply AI to All</span><span className="sm:hidden">Apply AI to All files</span> ({files.length})
+              </button>
+            </div>
+          ) : <div className="hidden sm:block" />}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 
               onClick={() => { setFiles([]); onClose(); }}
               disabled={uploading}
-              className="px-5 py-2 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 border border-gray-200 bg-white"
             >
               Cancel
             </button>
             <button 
               onClick={uploadFiles}
               disabled={uploading || files.length === 0 || !files.some(f => f.status === 'pending' && !f.error)}
-              className="px-6 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="flex-1 sm:flex-none justify-center px-4 sm:px-6 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {uploading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Uploading...
+                  <span className="hidden sm:inline">Uploading...</span><span className="sm:hidden">Upload...</span>
                 </>
               ) : (
                 'Upload Files'
@@ -405,23 +412,23 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
 
         {/* Dedicated Per-File AI Suggestions Modal Overlay */}
         {activeAiFileObj && activeAi && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white rounded-2xl p-6 w-full max-w-xl shadow-2xl border border-purple-500/30 relative">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white rounded-2xl p-4 sm:p-6 w-full max-w-xl shadow-2xl border border-purple-500/30 relative max-h-[95vh] overflow-y-auto flex flex-col">
               
               {/* Modal Header */}
-              <div className="flex items-start justify-between pb-4 border-b border-purple-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-400/30 text-purple-300">
+              <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-purple-500/20 shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="hidden sm:flex p-3 bg-purple-600/30 rounded-xl border border-purple-400/30 text-purple-300">
                     <Sparkles className="w-6 h-6 animate-pulse" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-bold text-white">VaultX AI Smart Suggestions</h3>
-                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-400/30 uppercase">
-                        {(activeAi.confidenceScore * 100).toFixed(0)}% Confidence
+                      <h3 className="text-base sm:text-lg font-bold text-white">VaultX AI Suggestions</h3>
+                      <span className="px-1.5 sm:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[9px] sm:text-[10px] font-bold rounded-full border border-purple-400/30 uppercase shrink-0">
+                        {(activeAi.confidenceScore * 100).toFixed(0)}% Conf
                       </span>
                     </div>
-                    <p className="text-xs text-purple-200/80 mt-0.5">
+                    <p className="text-[10px] sm:text-xs text-purple-200/80 mt-0.5 leading-tight line-clamp-2 sm:line-clamp-none">
                       Analyzed "{activeAiFileObj.file.name}". High confidence match for <span className="text-purple-300 font-semibold">{activeAi.suggestedType}</span>.
                     </p>
                   </div>
@@ -429,14 +436,14 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
 
                 <button 
                   onClick={() => setAiModalFileId(null)}
-                  className="p-1.5 text-purple-300 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                  className="p-1 sm:p-1.5 text-purple-300 hover:text-white hover:bg-white/10 rounded-full transition-colors ml-2 shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Suggestions Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-4 overflow-y-auto">
                 
                 {/* 1. Suggested Name */}
                 <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
@@ -555,20 +562,20 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
               </div>
 
               {/* Modal Footer Main Action */}
-              <div className="flex items-center justify-between pt-4 border-t border-purple-500/20">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between pt-4 border-t border-purple-500/20 gap-3 sm:gap-0 shrink-0">
                 <button 
                   onClick={() => setAiModalFileId(null)}
-                  className="px-4 py-2 text-xs font-medium text-purple-300 hover:text-white transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-purple-300 hover:text-white transition-colors bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none border border-purple-500/20 sm:border-none"
                 >
                   Cancel
                 </button>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <button
                     onClick={() => applyAiToFile(activeAiFileObj.id)}
-                    className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    className="justify-center px-4 py-2 sm:py-2.5 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
                   >
-                    <RotateCw className="w-3.5 h-3.5" /> Reprocess with AI
+                    <RotateCw className="w-3.5 h-3.5" /> <span className="sm:hidden">Reprocess</span><span className="hidden sm:inline">Reprocess with AI</span>
                   </button>
 
                   <button
@@ -576,7 +583,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                       updateFileAiField(activeAiFileObj.id, 'aiApplied', true);
                       setAiModalFileId(null);
                     }}
-                    className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all transform hover:scale-[1.02]"
+                    className="justify-center px-6 py-2.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all transform hover:scale-[1.02]"
                   >
                     <Check className="w-4 h-4" /> Save Changes
                   </button>
