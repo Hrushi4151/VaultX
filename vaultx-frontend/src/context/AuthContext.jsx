@@ -88,7 +88,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const walletLogin = useCallback(async (identifier, walletPassword) => {
-    setIsLoading(true);
     try {
       const data = await authService.walletLogin(identifier, walletPassword);
       const { accessToken, refreshToken, user: userData } = data.data;
@@ -101,13 +100,12 @@ export function AuthProvider({ children }) {
       if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
       return data;
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      throw error;
     }
   }, []);
 
   const faceLogin = useCallback(async (identifier, faceData) => {
-    setIsLoading(true);
     try {
       const data = await authService.faceLogin(identifier, faceData);
       const { accessToken, refreshToken, user: userData } = data.data;
@@ -120,8 +118,8 @@ export function AuthProvider({ children }) {
       if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
       return data;
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      throw error;
     }
   }, []);
 
