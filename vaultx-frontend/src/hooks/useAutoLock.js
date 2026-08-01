@@ -14,7 +14,11 @@ export default function useAutoLock() {
   const idleTimerRef = useRef(null);
 
   const getTimeoutMs = useCallback(() => {
-    const lockMinutes = parseInt(localStorage.getItem('VAULTX_AUTOLOCK_MINUTES') || '15', 10);
+    const stored = localStorage.getItem('VAULTX_AUTOLOCK_MINUTES');
+    let lockMinutes = parseInt(stored, 10);
+    if (isNaN(lockMinutes) || lockMinutes <= 0) {
+      lockMinutes = 15;
+    }
     return lockMinutes * 60 * 1000;
   }, []);
 
@@ -26,7 +30,8 @@ export default function useAutoLock() {
   const unlockVault = useCallback(() => {
     setIsLocked(false);
     localStorage.removeItem('VAULTX_IS_LOCKED');
-    resetIdleTimer(); // Restart idle timer upon unlocking
+    // We don't call resetIdleTimer here directly because it relies on stale closures.
+    // The useEffect will automatically restart the timers when isLocked becomes false.
   }, []);
 
   // Sync lock state across multiple tabs
@@ -53,6 +58,7 @@ export default function useAutoLock() {
   useEffect(() => {
     const handleBlur = () => {
       if (isLocked) return;
+      if (blurTimerRef.current) clearTimeout(blurTimerRef.current); // Fix: Prevent multiple timers leaking
       blurTimerRef.current = setTimeout(() => {
         lockVault();
       }, getTimeoutMs());
