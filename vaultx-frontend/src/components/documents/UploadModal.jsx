@@ -216,14 +216,12 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
   };
 
   const activeAiFileObj = files.find(f => f.id === aiModalFileId);
-  const activeAi = activeAiFileObj?.aiAnalysis || null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[95vh] sm:max-h-[90vh] relative">
+  const activeAi = activeAiFileObj?.aiAnalysis || null;  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[95vh] sm:max-h-[90vh] relative my-auto">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-800">Upload Documents</h2>
             <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">Select and optimize files before uploading</p>
@@ -238,7 +236,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
         </div>
 
         {/* Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto">
+        <div className="p-4 sm:p-6 overflow-y-auto min-h-0">
           
           {/* Drag & Drop Zone */}
           <div 
@@ -267,7 +265,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
           {/* File List Header & Bulk AI Button */}
           {files.length > 0 && (
             <div className="mt-6 space-y-3">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="font-semibold text-gray-700 text-sm">Selected Files ({files.length})</h3>
                 
                 <button
@@ -276,9 +274,8 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                   className="w-full sm:w-auto justify-center px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
                   title="Apply AI suggestions to all selected files in queue"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                  <span className="hidden sm:inline">Apply AI Suggestions to All ({files.length})</span>
-                  <span className="sm:hidden">Apply AI to All ({files.length})</span>
+                  <Sparkles className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+                  <span className="whitespace-nowrap">Apply AI to All ({files.length})</span>
                 </button>
               </div>
 
@@ -291,12 +288,12 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                     </div>
                     
                     <div className="ml-3 flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-800 truncate pr-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-gray-800 truncate flex-1 min-w-0">
                           {f.customName || f.file.name}
                         </p>
                         
-                        <div className="flex items-center gap-1.5 ml-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           {/* Dedicated AI Suggestion Icon Button per file */}
                           {f.status === 'pending' && (
                             <button
@@ -304,61 +301,57 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
                                 e.stopPropagation();
                                 handleOpenAiModal(f.id);
                               }}
-                              className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-medium flex items-center gap-1 transition-all shrink-0 ${
+                              className={`px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium flex items-center gap-1 transition-all shrink-0 ${
                                 f.aiApplied 
                                   ? 'bg-purple-100 text-purple-800 border border-purple-300 shadow-xs' 
                                   : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 hover:shadow-sm'
                               }`}
                               title="Open AI Suggestions for this file"
                             >
-                              <Sparkles className="w-3 h-3 text-purple-600" />
-                              {f.aiApplied ? (
-                                <><span className="hidden sm:inline">AI Suggestions Applied</span><span className="sm:hidden">Applied</span></>
-                              ) : (
-                                <><span className="hidden sm:inline">AI Suggestions</span><span className="sm:hidden">AI</span></>
-                              )}
+                              <Sparkles className="w-3 h-3 text-purple-600 shrink-0" />
+                              {f.aiApplied ? 'AI Applied' : 'AI Suggestions'}
                             </button>
                           )}
 
                           {f.status !== 'uploading' && f.status !== 'success' && (
-                            <button onClick={() => removeFile(f.id)} className="text-gray-400 hover:text-danger p-1">
+                            <button onClick={() => removeFile(f.id)} className="text-gray-400 hover:text-danger p-1 shrink-0">
                               <X className="w-4 h-4" />
                             </button>
                           )}
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-500">{formatSize(f.file.size)}</span>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 shrink-0">{formatSize(f.file.size)}</span>
                         
                         {f.aiApplied && (
-                          <span className="text-[11px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium border border-purple-100 flex items-center gap-1">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            {f.customCategory || f.aiAnalysis?.suggestedCategory} • {f.customCollection || f.aiAnalysis?.suggestedCollectionName}
+                          <span className="text-[11px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium border border-purple-100 flex items-center gap-1 min-w-0 truncate">
+                            <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                            <span className="truncate">{f.customCategory || f.aiAnalysis?.suggestedCategory} • {f.customCollection || f.aiAnalysis?.suggestedCollectionName}</span>
                           </span>
                         )}
 
                         {f.error ? (
-                          <span className="text-xs text-danger flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" /> {f.error}
+                          <span className="text-xs text-danger flex items-center gap-1 shrink-0">
+                            <AlertCircle className="w-3 h-3 shrink-0" /> <span className="truncate">{f.error}</span>
                           </span>
                         ) : f.status === 'success' ? (
-                          <span className="text-xs text-green-500 flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3" /> Uploaded
+                          <span className="text-xs text-green-500 flex items-center gap-1 shrink-0">
+                            <CheckCircle className="w-3 h-3 shrink-0" /> Uploaded
                           </span>
                         ) : f.status === 'error' ? (
-                          <span className="text-xs text-danger flex items-center gap-1">
-                            <XCircle className="w-3 h-3" /> Failed
+                          <span className="text-xs text-danger flex items-center gap-1 shrink-0">
+                            <XCircle className="w-3 h-3 shrink-0" /> Failed
                           </span>
                         ) : f.status === 'uploading' ? (
-                          <div className="flex-1 flex items-center gap-2 ml-2">
+                          <div className="flex-1 flex items-center gap-2 ml-2 min-w-0">
                             <div className="h-1.5 flex-1 bg-gray-200 rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-primary transition-all duration-300"
                                 style={{ width: `${f.progress}%` }}
                               />
                             </div>
-                            <span className="text-xs text-gray-500 font-medium w-8">{f.progress}%</span>
+                            <span className="text-xs text-gray-500 font-medium w-8 shrink-0">{f.progress}%</span>
                           </div>
                         ) : null}
                       </div>
@@ -372,20 +365,8 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 sm:gap-3 bg-gray-50/50 rounded-b-2xl">
-          {files.length > 0 ? (
-            <div className="flex justify-center sm:justify-start w-full sm:w-auto">
-              <button 
-                onClick={applyAiToAllFiles}
-                disabled={uploading}
-                className="text-xs font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1 transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Apply AI to All</span><span className="sm:hidden">Apply AI to All files</span> ({files.length})
-              </button>
-            </div>
-          ) : <div className="hidden sm:block" />}
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50 rounded-b-2xl shrink-0">
+          <div className="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
             <button 
               onClick={() => { setFiles([]); onClose(); }}
               disabled={uploading}
@@ -400,196 +381,210 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete }) {
             >
               {uploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span className="hidden sm:inline">Uploading...</span><span className="sm:hidden">Upload...</span>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                  <span>Uploading...</span>
                 </>
               ) : (
-                'Upload Files'
+                <span>Upload Files</span>
               )}
             </button>
+          </div>
+
+          <div className="flex w-full sm:w-auto order-2 sm:order-1">
+            {files.length > 0 ? (
+              <button 
+                onClick={applyAiToAllFiles}
+                disabled={uploading}
+                className="w-full sm:w-auto justify-center text-xs font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0" /> <span>Apply AI to All ({files.length})</span>
+              </button>
+            ) : <div className="hidden sm:block" />}
           </div>
         </div>
 
         {/* Dedicated Per-File AI Suggestions Modal Overlay */}
         {activeAiFileObj && activeAi && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white rounded-2xl p-4 sm:p-6 w-full max-w-xl shadow-2xl border border-purple-500/30 relative max-h-[95vh] overflow-y-auto flex flex-col">
-              
-              {/* Modal Header */}
-              <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-purple-500/20 shrink-0">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="hidden sm:flex p-3 bg-purple-600/30 rounded-xl border border-purple-400/30 text-purple-300">
-                    <Sparkles className="w-6 h-6 animate-pulse" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base sm:text-lg font-bold text-white">VaultX AI Suggestions</h3>
-                      <span className="px-1.5 sm:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[9px] sm:text-[10px] font-bold rounded-full border border-purple-400/30 uppercase shrink-0">
-                        {(activeAi.confidenceScore * 100).toFixed(0)}% Conf
-                      </span>
-                    </div>
-                    <p className="text-[10px] sm:text-xs text-purple-200/80 mt-0.5 leading-tight line-clamp-2 sm:line-clamp-none">
-                      Analyzed "{activeAiFileObj.file.name}". High confidence match for <span className="text-purple-300 font-semibold">{activeAi.suggestedType}</span>.
-                    </p>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={() => setAiModalFileId(null)}
-                  className="p-1 sm:p-1.5 text-purple-300 hover:text-white hover:bg-white/10 rounded-full transition-colors ml-2 shrink-0"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Suggestions Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-4 overflow-y-auto">
+          <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-md animate-fade-in overflow-y-auto p-3 sm:p-4">
+            <div className="min-h-full flex items-center justify-center py-4">
+              <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white rounded-2xl p-4 sm:p-6 w-full max-w-xl shadow-2xl border border-purple-500/30 relative flex flex-col">
                 
-                {/* 1. Suggested Name */}
-                <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Name</span>
-                    <input 
-                      type="text"
-                      value={activeAiFileObj.customName || activeAi.suggestedName}
-                      onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customName', e.target.value)}
-                      className="w-full mt-1.5 bg-black/40 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400"
-                    />
-                  </div>
-                  <button 
-                    onClick={() => updateFileAiField(activeAiFileObj.id, 'customName', activeAi.suggestedName)}
-                    className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
-                  >
-                    <Check className="w-3 h-3" /> Apply Name
-                  </button>
-                </div>
-
-                {/* 2. Suggested Category */}
-                <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Category</span>
-                    <select
-                      value={activeAiFileObj.customCategory || activeAi.suggestedCategory}
-                      onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customCategory', e.target.value)}
-                      className="w-full mt-1.5 bg-slate-900 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400 cursor-pointer"
-                    >
-                      {['Identity', 'Education', 'Employment', 'Finance', 'Health', 'Personal', 'Insurance'].map((c, i) => (
-                        <option key={i} value={c} className="bg-slate-900 text-white">
-                          📁 {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button 
-                    onClick={() => updateFileAiField(activeAiFileObj.id, 'customCategory', activeAiFileObj.customCategory || activeAi.suggestedCategory)}
-                    className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
-                  >
-                    <Check className="w-3 h-3" /> Apply Category
-                  </button>
-                </div>
-
-                {/* 3. Target Collection Dropdown */}
-                <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Target Collection</span>
-                    <select
-                      value={activeAiFileObj.customCollection || activeAi.suggestedCollectionName}
-                      onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customCollection', e.target.value)}
-                      className="w-full mt-1.5 bg-slate-900 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400"
-                    >
-                      {activeAi.suggestedCollectionNames?.map((colName, idx) => (
-                        <option key={idx} value={colName} className="bg-slate-900 text-white">
-                          📁 {colName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button 
-                    onClick={() => updateFileAiField(activeAiFileObj.id, 'customCollection', activeAiFileObj.customCollection || activeAi.suggestedCollectionName)}
-                    className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
-                  >
-                    <Check className="w-3 h-3" /> Add to Collection
-                  </button>
-                </div>
-
-                {/* 4. Suggested Smart Tags */}
-                <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
-                  <div>
-                    <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Smart Tags</span>
-                    <div className="mt-1.5 flex flex-wrap gap-1 mb-1.5 max-h-16 overflow-y-auto">
-                      {(activeAiFileObj.customTags || activeAi.suggestedTags || []).map((tag, i) => (
-                        <span key={i} className="text-[10px] bg-purple-500/30 text-purple-200 border border-purple-400/30 px-1.5 py-0.5 rounded font-mono flex items-center gap-1">
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentTags = activeAiFileObj.customTags || activeAi.suggestedTags || [];
-                              updateFileAiField(activeAiFileObj.id, 'customTags', currentTags.filter((_, idx) => idx !== i));
-                            }}
-                            className="text-purple-300 hover:text-white font-bold ml-0.5"
-                          >
-                            ×
-                          </button>
+                {/* Modal Header */}
+                <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-purple-500/20 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="hidden sm:flex p-3 bg-purple-600/30 rounded-xl border border-purple-400/30 text-purple-300">
+                      <Sparkles className="w-6 h-6 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base sm:text-lg font-bold text-white">VaultX AI Suggestions</h3>
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[9px] sm:text-[10px] font-bold rounded-full border border-purple-400/30 uppercase shrink-0">
+                          {(activeAi.confidenceScore * 100).toFixed(0)}% Conf
                         </span>
-                      ))}
+                      </div>
+                      <p className="text-[10px] sm:text-xs text-purple-200/80 mt-0.5 leading-tight line-clamp-2 sm:line-clamp-none">
+                        Analyzed "{activeAiFileObj.file.name}". High confidence match for <span className="text-purple-300 font-semibold">{activeAi.suggestedType}</span>.
+                      </p>
                     </div>
-                    <input
-                      type="text"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.target.value.trim()) {
-                          e.preventDefault();
-                          const val = e.target.value.trim();
-                          const newTag = val.startsWith('#') ? val : '#' + val;
-                          const currentTags = activeAiFileObj.customTags || activeAi.suggestedTags || [];
-                          if (!currentTags.includes(newTag)) {
-                            updateFileAiField(activeAiFileObj.id, 'customTags', [...currentTags, newTag]);
-                          }
-                          e.target.value = '';
-                        }
-                      }}
-                      placeholder="Add tag (Press Enter)..."
-                      className="w-full text-[11px] bg-purple-950/70 border border-purple-400/30 rounded-lg px-2 py-1 text-white outline-none focus:border-purple-300"
-                    />
                   </div>
+
                   <button 
-                    onClick={() => updateFileAiField(activeAiFileObj.id, 'customTags', activeAiFileObj.customTags || activeAi.suggestedTags)}
-                    className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
+                    onClick={() => setAiModalFileId(null)}
+                    className="p-1 sm:p-1.5 text-purple-300 hover:text-white hover:bg-white/10 rounded-full transition-colors ml-2 shrink-0"
                   >
-                    <Tag className="w-3 h-3" /> Apply Tags
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
 
-              </div>
+                {/* Suggestions Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-4 min-h-0">
+                  
+                  {/* 1. Suggested Name */}
+                  <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
+                    <div>
+                      <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Name</span>
+                      <input 
+                        type="text"
+                        value={activeAiFileObj.customName || activeAi.suggestedName}
+                        onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customName', e.target.value)}
+                        className="w-full mt-1.5 bg-black/40 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => updateFileAiField(activeAiFileObj.id, 'customName', activeAi.suggestedName)}
+                      className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
+                    >
+                      <Check className="w-3 h-3" /> Apply Name
+                    </button>
+                  </div>
 
-              {/* Modal Footer Main Action */}
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between pt-4 border-t border-purple-500/20 gap-3 sm:gap-0 shrink-0">
-                <button 
-                  onClick={() => setAiModalFileId(null)}
-                  className="px-4 py-2 text-xs font-medium text-purple-300 hover:text-white transition-colors bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none border border-purple-500/20 sm:border-none"
-                >
-                  Cancel
-                </button>
-                
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <button
-                    onClick={() => applyAiToFile(activeAiFileObj.id)}
-                    className="justify-center px-4 py-2 sm:py-2.5 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
-                  >
-                    <RotateCw className="w-3.5 h-3.5" /> <span className="sm:hidden">Reprocess</span><span className="hidden sm:inline">Reprocess with AI</span>
-                  </button>
+                  {/* 2. Suggested Category */}
+                  <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
+                    <div>
+                      <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Category</span>
+                      <select
+                        value={activeAiFileObj.customCategory || activeAi.suggestedCategory}
+                        onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customCategory', e.target.value)}
+                        className="w-full mt-1.5 bg-slate-900 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400 cursor-pointer"
+                      >
+                        {['Identity', 'Education', 'Employment', 'Finance', 'Health', 'Personal', 'Insurance'].map((c, i) => (
+                          <option key={i} value={c} className="bg-slate-900 text-white">
+                            📁 {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <button 
+                      onClick={() => updateFileAiField(activeAiFileObj.id, 'customCategory', activeAiFileObj.customCategory || activeAi.suggestedCategory)}
+                      className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
+                    >
+                      <Check className="w-3 h-3" /> Apply Category
+                    </button>
+                  </div>
 
-                  <button
-                    onClick={() => {
-                      updateFileAiField(activeAiFileObj.id, 'aiApplied', true);
-                      setAiModalFileId(null);
-                    }}
-                    className="justify-center px-6 py-2.5 sm:py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all transform hover:scale-[1.02]"
-                  >
-                    <Check className="w-4 h-4" /> Save Changes
-                  </button>
+                  {/* 3. Target Collection Dropdown */}
+                  <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
+                    <div>
+                      <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Target Collection</span>
+                      <select
+                        value={activeAiFileObj.customCollection || activeAi.suggestedCollectionName}
+                        onChange={(e) => updateFileAiField(activeAiFileObj.id, 'customCollection', e.target.value)}
+                        className="w-full mt-1.5 bg-slate-900 border border-purple-500/30 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-purple-400"
+                      >
+                        {activeAi.suggestedCollectionNames?.map((colName, idx) => (
+                          <option key={idx} value={colName} className="bg-slate-900 text-white">
+                            📁 {colName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <button 
+                      onClick={() => updateFileAiField(activeAiFileObj.id, 'customCollection', activeAiFileObj.customCollection || activeAi.suggestedCollectionName)}
+                      className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
+                    >
+                      <Check className="w-3 h-3" /> Add to Collection
+                    </button>
+                  </div>
+
+                  {/* 4. Suggested Smart Tags */}
+                  <div className="bg-white/5 border border-purple-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/40 transition-all">
+                    <div>
+                      <span className="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Suggested Smart Tags</span>
+                      <div className="mt-1.5 flex flex-wrap gap-1 mb-1.5 max-h-16 overflow-y-auto">
+                        {(activeAiFileObj.customTags || activeAi.suggestedTags || []).map((tag, i) => (
+                          <span key={i} className="text-[10px] bg-purple-500/30 text-purple-200 border border-purple-400/30 px-1.5 py-0.5 rounded font-mono flex items-center gap-1">
+                            {tag}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentTags = activeAiFileObj.customTags || activeAi.suggestedTags || [];
+                                updateFileAiField(activeAiFileObj.id, 'customTags', currentTags.filter((_, idx) => idx !== i));
+                              }}
+                              className="text-purple-300 hover:text-white font-bold ml-0.5 shrink-0"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <input
+                        type="text"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && e.target.value.trim()) {
+                            e.preventDefault();
+                            const val = e.target.value.trim();
+                            const newTag = val.startsWith('#') ? val : '#' + val;
+                            const currentTags = activeAiFileObj.customTags || activeAi.suggestedTags || [];
+                            if (!currentTags.includes(newTag)) {
+                              updateFileAiField(activeAiFileObj.id, 'customTags', [...currentTags, newTag]);
+                            }
+                            e.target.value = '';
+                          }
+                        }}
+                        placeholder="Add tag (Press Enter)..."
+                        className="w-full text-[11px] bg-purple-950/70 border border-purple-400/30 rounded-lg px-2 py-1 text-white outline-none focus:border-purple-300"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => updateFileAiField(activeAiFileObj.id, 'customTags', activeAiFileObj.customTags || activeAi.suggestedTags)}
+                      className="mt-3 w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/30 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all"
+                    >
+                      <Tag className="w-3 h-3" /> Apply Tags
+                    </button>
+                  </div>
+
                 </div>
-              </div>
 
+                {/* Modal Footer Main Action */}
+                <div className="flex flex-wrap flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between pt-4 border-t border-purple-500/20 gap-3 shrink-0 mt-2">
+                  <button 
+                    onClick={() => setAiModalFileId(null)}
+                    className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-purple-300 hover:text-white transition-colors bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none border border-purple-500/20 sm:border-none"
+                  >
+                    Cancel
+                  </button>
+                  
+                  <div className="flex w-full sm:w-auto flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <button
+                      onClick={() => applyAiToFile(activeAiFileObj.id)}
+                      className="justify-center flex-1 sm:flex-none px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    >
+                      <RotateCw className="w-3.5 h-3.5 shrink-0" /> <span>Reprocess</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        updateFileAiField(activeAiFileObj.id, 'aiApplied', true);
+                        setAiModalFileId(null);
+                      }}
+                      className="justify-center flex-1 sm:flex-none px-6 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/25 flex items-center gap-2 transition-all transform hover:scale-[1.02]"
+                    >
+                      <Check className="w-4 h-4 shrink-0" /> Save Changes
+                    </button>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
         )}
