@@ -41,24 +41,25 @@ The project demonstrates modern microservices architecture using **Spring Boot**
 
 ## 🔐 Authentication & Security
 - JWT Authentication & Refresh Token Support
-- Email OTP Verification
+- **Continuous Session Monitoring (Heartbeat)**: Actively detects and terminates hijacked or expired sessions.
+- **Auto-Lock Security Overlay**: Automatically locks the screen on inactivity/un-focus, requiring a PIN or Password to unlock and preventing physical unauthorized access.
+- Email OTP Verification & Password Reset
 - Face Authentication (Biometric Login)
-- Session Management & Device Tracking
-- Password Reset & PIN Protection
 - BCrypt Password Encryption
 - Role-Based Access Control (RBAC)
-- Rate Limiting & Request Logging
-- Global Exception Handling
+- Rate Limiting, Request Logging, and Global Exception Handling
 
 ---
 
 ## 📁 Document Management
 - Upload, Download, and Preview Documents
-- **Trash Manager**: 30-Day Auto Retention and one-click Restore
-- Folder / Collection Management with Grid & List toggles
-- Categories, Tags, and Metadata Storage
-- Multi-file Batch Operations (Select, Delete, Move)
-- Local File System or Cloud Storage Ready
+- **Cross-Platform PDF Viewer**: Integrated native `react-pdf` engine ensuring seamless PDF rendering on both desktop and mobile devices.
+- **Smart Sorting & Filtering**: Sort documents instantly by Name, Date, or Size.
+- **Trash Manager**: 30-Day Auto Retention and one-click Restore.
+- Folder / Collection Management with Grid & List toggles.
+- Categories, Tags, and Metadata Storage.
+- Multi-file Batch Operations (Select, Delete, Move).
+- Local File System or Cloud Storage Ready.
 
 ---
 
