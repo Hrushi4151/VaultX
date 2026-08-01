@@ -103,7 +103,7 @@ export default function AppRouter() {
       <Routes>
         {/* ── Public routes ─────────────────────────────── */}
         <Route element={<PublicLayout />}>
-          <Route path={ROUTES.HOME} element={<LandingPage />} />
+          <Route path={ROUTES.HOME} element={<PublicRoute><LandingPage /></PublicRoute>} />
 
           {/* Auth routes — redirect authenticated users to dashboard */}
           <Route path={ROUTES.LOGIN}    element={<PublicRoute><LoginPage /></PublicRoute>} />
