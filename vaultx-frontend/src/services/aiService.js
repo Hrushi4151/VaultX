@@ -13,11 +13,7 @@ const aiService = {
   analyzePreview: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/engine/ai/analyze-preview', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    return api.post('/engine/ai/analyze-preview', formData);
   },
   applySuggestions: (documentId, params) => {
     return api.post(`/engine/ai/apply-suggestions/${documentId}`, params);

@@ -13,7 +13,6 @@ const documentService = {
     formData.append('metadata', metadataBlob);
 
     return api.post('/documents/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress
     });
   },

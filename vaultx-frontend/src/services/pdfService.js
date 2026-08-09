@@ -17,7 +17,6 @@ const pdfService = {
   // Protect & encrypt PDF with real passwords via backend PDFBox engine
   protectPdf: (formData) => {
     return api.post('/pdf/protect', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
       responseType: 'blob'
     });
   }
