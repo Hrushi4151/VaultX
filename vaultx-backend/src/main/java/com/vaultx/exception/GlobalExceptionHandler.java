@@ -88,6 +88,22 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("File size exceeds the maximum allowed upload limit (100MB).", "FILE_TOO_LARGE", null));
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.support.MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingRequestPart(
+            org.springframework.web.multipart.support.MissingServletRequestPartException ex, WebRequest request) {
+        log.warn("Missing required request part: {}", ex.getRequestPartName());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Required multipart request item '" + ex.getRequestPartName() + "' is missing.", "MISSING_REQUEST_PART", null));
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MultipartException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMultipartException(
+            org.springframework.web.multipart.MultipartException ex, WebRequest request) {
+        log.warn("Multipart upload error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Failed to process multipart file upload. Please verify file format.", "MULTIPART_ERROR", null));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
             AccessDeniedException ex, WebRequest request) {

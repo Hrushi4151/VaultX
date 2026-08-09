@@ -37,7 +37,10 @@ public class DocumentController {
     @Operation(summary = "Upload a single document")
     public ResponseEntity<DocumentDto> uploadDocument(
             @RequestPart("file") MultipartFile file,
-            @RequestPart("metadata") DocumentUploadRequest request) {
+            @RequestPart(value = "metadata", required = false) DocumentUploadRequest request) {
+        if (request == null) {
+            request = new DocumentUploadRequest();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(documentService.uploadDocument(file, request));
     }
 
@@ -45,7 +48,10 @@ public class DocumentController {
     @Operation(summary = "Upload multiple documents")
     public ResponseEntity<List<DocumentDto>> uploadMultipleDocuments(
             @RequestPart("files") List<MultipartFile> files,
-            @RequestPart("metadata") DocumentUploadRequest request) {
+            @RequestPart(value = "metadata", required = false) DocumentUploadRequest request) {
+        if (request == null) {
+            request = new DocumentUploadRequest();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(documentService.uploadMultipleDocuments(files, request));
     }
 
