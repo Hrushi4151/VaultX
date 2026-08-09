@@ -57,7 +57,11 @@ public class FaceBiometricMatcher {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
 
-            String url = aiServiceUrl + "/api/v1/ai/face-match";
+            String baseUrl = aiServiceUrl.trim();
+            if (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            String url = baseUrl + "/api/v1/ai/face-match";
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

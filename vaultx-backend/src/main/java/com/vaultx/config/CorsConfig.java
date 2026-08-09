@@ -19,24 +19,24 @@ import java.util.List;
 @Slf4j
 public class CorsConfig {
 
-    @Value("${vaultx.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
+    @Value("${vaultx.cors.allowed-origins:http://localhost:3000,http://localhost:5173,https://vaultx-frontend-zeta.vercel.app}")
     private String allowedOriginsString;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        List<String> allowedOrigins = Arrays.asList(allowedOriginsString.split(","));
+        List<String> allowedOrigins = Arrays.stream(allowedOriginsString.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
         log.info("Configuring CORS — allowed origins: {}", allowedOrigins);
 
         configuration.setAllowedOriginPatterns(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of(
-                "Authorization", "Content-Type", "Accept", "Origin",
-                "X-Requested-With", "Access-Control-Request-Method", "Access-Control-Request-Headers",
-                "X-Refresh-Token", "x-refresh-token"
-        ));
-        configuration.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        configuration.setAllowedHeaders(List.of("*")); // Allow all headers including X-CSRF-TOKEN, X-Refresh-Token
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Disposition", "X-CSRF-TOKEN", "XSRF-TOKEN", "Set-Cookie"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
