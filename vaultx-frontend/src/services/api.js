@@ -46,6 +46,12 @@ api.interceptors.request.use(
     if (csrfToken) {
       config.headers['X-CSRF-TOKEN'] = csrfToken;
     }
+
+    // Automatically remove default application/json header for FormData uploads
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

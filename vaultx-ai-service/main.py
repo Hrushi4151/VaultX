@@ -168,14 +168,32 @@ async def ocr(file: UploadFile = File(...)):
         })
 
 
+def clean_base64(b64_str: str) -> str:
+    if not b64_str:
+        return ""
+    if "," in b64_str:
+        return b64_str.split(",", 1)[1]
+    return b64_str
+
+
 @app.post("/api/v1/ai/face-match")
 async def face_match(request: FaceMatchRequest):
 
     try:
+        reg_b64 = clean_base64(request.registeredImage)
+        cand_b64 = clean_base64(request.candidateImage)
+
+        if not reg_b64 or not cand_b64:
+            return JSONResponse({
+                "success": False,
+                "match": False,
+                "confidence": 0.0,
+                "error": "Missing base64 image data"
+            })
 
         reg = cv2.imdecode(
             np.frombuffer(
-                base64.b64decode(request.registeredImage),
+                base64.b64decode(reg_b64),
                 np.uint8
             ),
             cv2.IMREAD_COLOR
@@ -183,11 +201,19 @@ async def face_match(request: FaceMatchRequest):
 
         cand = cv2.imdecode(
             np.frombuffer(
-                base64.b64decode(request.candidateImage),
+                base64.b64decode(cand_b64),
                 np.uint8
             ),
             cv2.IMREAD_COLOR
         )
+
+        if reg is None or cand is None:
+            return JSONResponse({
+                "success": False,
+                "match": False,
+                "confidence": 0.0,
+                "error": "Could not decode face image bytes"
+            })
 
         import sface_matcher
 
@@ -196,17 +222,19 @@ async def face_match(request: FaceMatchRequest):
         return JSONResponse(
             {
                 "success": True,
-                "match": match,
-                "confidence": score
+                "match": bool(match),
+                "confidence": float(score)
             }
         )
 
     except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+        print("FACE MATCH ERROR:", e)
+        return JSONResponse({
+            "success": False,
+            "match": False,
+            "confidence": 0.0,
+            "error": str(e)
+        })
 
 
 if __name__ == "__main__":
