@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Component("apiRateLimitingFilter")
 @RequiredArgsConstructor
 @Slf4j
 public class RateLimitingFilter extends OncePerRequestFilter {
