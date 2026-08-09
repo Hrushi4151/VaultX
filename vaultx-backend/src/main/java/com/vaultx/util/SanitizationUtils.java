@@ -15,9 +15,10 @@ public class SanitizationUtils {
         // Get single file basename to eliminate path components
         String clean = Paths.get(filename).getFileName().toString();
 
-        // Strip path traversal attempts and control characters
+        // Strip path traversal attempts and control characters safely
         clean = clean.replaceAll("(?i)\\.\\.[\\\\/]", "")
-                     .replaceAll("[\\r\\n\\t\\0]", "")
+                     .replace("\0", "")
+                     .replaceAll("[\r\n\t]", "")
                      .trim();
 
         if (clean.isEmpty()) {
@@ -33,7 +34,7 @@ public class SanitizationUtils {
         if (input == null) return null;
         return input.replaceAll("(?i)<script.*?>.*?</script>", "")
                     .replaceAll("(?i)<javascript:.*?>", "")
-                    .replaceAll("[\\0]", "")
+                    .replace("\0", "")
                     .trim();
     }
 }
