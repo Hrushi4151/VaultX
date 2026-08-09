@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface DuplicateDetectionService {
     List<Document> findExactDuplicates(String checksum);
     List<Document> findDuplicatesByName(String displayName);
+    List<Document> findDuplicatesByOcrText(String ocrText, double similarityThreshold);
 }

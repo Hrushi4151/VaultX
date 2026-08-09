@@ -18,5 +18,8 @@ public class DuplicateGroupDto {
     private long fileSize;
     private int duplicateCount;
     private long wastedBytes;
+    private String detectionType; // EXACT_CHECKSUM, OCR_TEXT_EXACT, OCR_TEXT_SIMILAR, FILENAME_MATCH
+    private Double similarityPercentage;
+    private String matchReason;
     private List<DocumentDto> documents;
 }

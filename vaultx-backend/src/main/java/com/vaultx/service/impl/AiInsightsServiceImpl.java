@@ -10,6 +10,7 @@ import com.vaultx.exception.ResourceNotFoundException;
 import com.vaultx.mapper.DocumentMapper;
 import com.vaultx.repository.*;
 import com.vaultx.service.AiInsightsService;
+import com.vaultx.util.TextSimilarityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,13 +69,9 @@ public class AiInsightsServiceImpl implements AiInsightsService {
             expiringSummary = "No expiring documents";
         }
 
-        Map<String, List<Document>> groupedByChecksum = activeDocs.stream()
-                .filter(d -> d != null && d.getChecksum() != null && !d.getChecksum().isEmpty())
-                .collect(Collectors.groupingBy(Document::getChecksum));
-
-        long duplicateGroupsCount = groupedByChecksum.values().stream().filter(list -> list.size() > 1).count();
-        long duplicateFilesCount = groupedByChecksum.values().stream().filter(list -> list.size() > 1)
-                .mapToLong(list -> list.size() - 1).sum();
+        List<DuplicateGroupDto> groups = getDuplicateGroups();
+        long duplicateGroupsCount = groups.size();
+        long duplicateFilesCount = groups.stream().mapToLong(g -> g.getDuplicateCount() - 1).sum();
 
         return AiInsightsSummaryDto.builder()
                 .smartCategorizedCount(smartCategorizedCount > 0 ? smartCategorizedCount : activeDocs.size())
@@ -199,12 +196,20 @@ public class AiInsightsServiceImpl implements AiInsightsService {
     public List<DuplicateGroupDto> getDuplicateGroups() {
         User user = getCurrentUser();
         List<Document> activeDocs = documentRepository.findByOwnerIdAndDeletedFalse(user.getId());
+        List<OcrResult> ocrResults = ocrResultRepository.findByDocumentOwnerIdAndDocumentDeletedFalse(user.getId());
 
+        Map<UUID, String> docIdToOcrText = ocrResults.stream()
+                .filter(o -> o != null && o.getDocument() != null && o.getExtractedText() != null)
+                .collect(Collectors.toMap(o -> o.getDocument().getId(), OcrResult::getExtractedText, (v1, v2) -> v1));
+
+        List<DuplicateGroupDto> duplicateGroups = new ArrayList<>();
+        Set<UUID> processedDocIds = new HashSet<>();
+
+        // PASS 1: Exact Binary Checksum Match (100% Raw File Byte Match)
         Map<String, List<Document>> groupedByChecksum = activeDocs.stream()
                 .filter(d -> d != null && d.getChecksum() != null && !d.getChecksum().isEmpty())
                 .collect(Collectors.groupingBy(Document::getChecksum));
 
-        List<DuplicateGroupDto> duplicateGroups = new ArrayList<>();
         for (Map.Entry<String, List<Document>> entry : groupedByChecksum.entrySet()) {
             List<Document> docs = entry.getValue();
             if (docs != null && docs.size() > 1) {
@@ -219,6 +224,103 @@ public class AiInsightsServiceImpl implements AiInsightsService {
                         .fileSize(fileSize)
                         .duplicateCount(docs.size())
                         .wastedBytes(wastedBytes)
+                        .detectionType("EXACT_CHECKSUM")
+                        .similarityPercentage(100.0)
+                        .matchReason("Exact Binary File Match (SHA-256 Checksum)")
+                        .documents(dtoList)
+                        .build());
+
+                docs.forEach(d -> processedDocIds.add(d.getId()));
+            }
+        }
+
+        // PASS 2: Exact & Fuzzy OCR Content Match
+        List<Document> remainingDocs = activeDocs.stream()
+                .filter(d -> d != null && !processedDocIds.contains(d.getId()))
+                .collect(Collectors.toList());
+
+        List<Document> ocrEligibleDocs = remainingDocs.stream()
+                .filter(d -> docIdToOcrText.containsKey(d.getId()) && docIdToOcrText.get(d.getId()).trim().length() >= 15)
+                .collect(Collectors.toList());
+
+        Set<UUID> ocrProcessedIds = new HashSet<>();
+
+        for (int i = 0; i < ocrEligibleDocs.size(); i++) {
+            Document primary = ocrEligibleDocs.get(i);
+            if (ocrProcessedIds.contains(primary.getId())) continue;
+
+            String primaryText = docIdToOcrText.get(primary.getId());
+            List<Document> matchedGroup = new ArrayList<>();
+            matchedGroup.add(primary);
+            double minSimilarityInGroup = 1.0;
+
+            for (int j = i + 1; j < ocrEligibleDocs.size(); j++) {
+                Document candidate = ocrEligibleDocs.get(j);
+                if (ocrProcessedIds.contains(candidate.getId())) continue;
+
+                String candidateText = docIdToOcrText.get(candidate.getId());
+                double sim = TextSimilarityUtils.calculateSimilarity(primaryText, candidateText);
+
+                if (sim >= 0.80) { // 80%+ threshold for OCR similarity
+                    matchedGroup.add(candidate);
+                    ocrProcessedIds.add(candidate.getId());
+                    minSimilarityInGroup = Math.min(minSimilarityInGroup, sim);
+                }
+            }
+
+            if (matchedGroup.size() > 1) {
+                ocrProcessedIds.add(primary.getId());
+                matchedGroup.forEach(d -> processedDocIds.add(d.getId()));
+
+                double simPct = Math.round(minSimilarityInGroup * 1000.0) / 10.0;
+                long fileSize = primary.getFileSize();
+                long wastedBytes = fileSize * (matchedGroup.size() - 1);
+                List<DocumentDto> dtoList = matchedGroup.stream().map(documentMapper::toDto).collect(Collectors.toList());
+
+                boolean isExactOcr = simPct >= 99.0;
+                String type = isExactOcr ? "OCR_TEXT_EXACT" : "OCR_TEXT_SIMILAR";
+                String reason = isExactOcr ? "100% Identical OCR Document Content" : String.format("%.1f%% Similar OCR Text Content", simPct);
+
+                duplicateGroups.add(DuplicateGroupDto.builder()
+                        .checksum("OCR-" + primary.getId())
+                        .fileName(primary.getDisplayName())
+                        .fileSize(fileSize)
+                        .duplicateCount(matchedGroup.size())
+                        .wastedBytes(wastedBytes)
+                        .detectionType(type)
+                        .similarityPercentage(simPct)
+                        .matchReason(reason)
+                        .documents(dtoList)
+                        .build());
+            }
+        }
+
+        // PASS 3: Filename Matching for remaining documents
+        List<Document> finalRemaining = activeDocs.stream()
+                .filter(d -> d != null && !processedDocIds.contains(d.getId()))
+                .collect(Collectors.toList());
+
+        Map<String, List<Document>> groupedByName = finalRemaining.stream()
+                .filter(d -> d.getDisplayName() != null && !d.getDisplayName().trim().isEmpty())
+                .collect(Collectors.groupingBy(d -> d.getDisplayName().trim().toLowerCase()));
+
+        for (Map.Entry<String, List<Document>> entry : groupedByName.entrySet()) {
+            List<Document> docs = entry.getValue();
+            if (docs != null && docs.size() > 1) {
+                Document first = docs.get(0);
+                long fileSize = first.getFileSize();
+                long wastedBytes = fileSize * (docs.size() - 1);
+                List<DocumentDto> dtoList = docs.stream().map(documentMapper::toDto).collect(Collectors.toList());
+
+                duplicateGroups.add(DuplicateGroupDto.builder()
+                        .checksum("NAME-" + first.getId())
+                        .fileName(first.getDisplayName())
+                        .fileSize(fileSize)
+                        .duplicateCount(docs.size())
+                        .wastedBytes(wastedBytes)
+                        .detectionType("FILENAME_MATCH")
+                        .similarityPercentage(100.0)
+                        .matchReason("Matching File Name")
                         .documents(dtoList)
                         .build());
             }
