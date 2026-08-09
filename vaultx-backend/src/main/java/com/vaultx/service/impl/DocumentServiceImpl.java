@@ -163,11 +163,26 @@ public class DocumentServiceImpl implements DocumentService {
         Document savedDocument = documentRepository.save(document);
         activityService.logActivity(savedDocument, user, "UPLOAD", "Uploaded document: " + originalFilename);
 
-        // Trigger OCR engine (which will subsequently trigger AI Classification)
-        try {
-            ocrEngineService.processDocument(savedDocument.getId());
-        } catch (Exception e) {
-            log.error("Failed to queue document {} for OCR processing", savedDocument.getId(), e);
+        // Trigger OCR engine after transaction commits to prevent database race condition
+        if (org.springframework.transaction.support.TransactionSynchronizationManager.isSynchronizationActive()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            ocrEngineService.processDocument(savedDocument.getId());
+                        } catch (Exception e) {
+                            log.error("Failed to trigger OCR processing for document {}", savedDocument.getId(), e);
+                        }
+                    }
+                }
+            );
+        } else {
+            try {
+                ocrEngineService.processDocument(savedDocument.getId());
+            } catch (Exception e) {
+                log.error("Failed to queue document {} for OCR processing", savedDocument.getId(), e);
+            }
         }
 
         return documentMapper.toDto(savedDocument);
