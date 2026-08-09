@@ -5,6 +5,10 @@ spring:
   application:
     name: vaultx-backend
 
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/vaultx}
     username: ${DB_USERNAME:vaultx}
@@ -21,8 +25,8 @@ spring:
 
     hikari:
       pool-name: VaultXHikariPool
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: 5
+      minimum-idle: 1
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
@@ -101,6 +105,10 @@ springdoc:
     doc-expansion: none
 
 management:
+  health:
+    redis:
+      enabled: false
+
   endpoints:
     web:
       exposure:
