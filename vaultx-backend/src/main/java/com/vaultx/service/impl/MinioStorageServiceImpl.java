@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -47,6 +48,12 @@ public class MinioStorageServiceImpl implements StorageService {
         }
 
         try {
+            if (minioUrl == null || minioUrl.contains("localhost") || minioUrl.contains("127.0.0.1") || minioUrl.trim().isEmpty()) {
+                isMinioAvailable = false;
+                log.info("MinIO / R2 storage URL is local/default ({}). Defaulting to Local Disk Storage at {}", minioUrl, localStorageDir);
+                return;
+            }
+
             minioClient = MinioClient.builder()
                     .endpoint(minioUrl)
                     .credentials(accessKey, secretKey)
@@ -67,13 +74,21 @@ public class MinioStorageServiceImpl implements StorageService {
 
     @Override
     public void uploadFile(String bucketName, String objectName, InputStream inputStream, String contentType) {
+        byte[] fileBytes;
+        try {
+            fileBytes = inputStream.readAllBytes();
+        } catch (Exception e) {
+            log.error("Failed to read upload input stream", e);
+            throw new BusinessException("Failed to read file stream for upload");
+        }
+
         if (isMinioAvailable && minioClient != null) {
-            try {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(fileBytes)) {
                 minioClient.putObject(
                     PutObjectArgs.builder()
                         .bucket(bucketName)
                         .object(objectName)
-                        .stream(inputStream, -1, 10485760) // Part size 10MB
+                        .stream(bais, fileBytes.length, -1)
                         .contentType(contentType)
                         .build()
                 );
@@ -84,11 +99,11 @@ public class MinioStorageServiceImpl implements StorageService {
             }
         }
 
-        // Resilient Local Disk Storage Fallback
-        try {
+        // Resilient Local Disk Storage Fallback with fresh byte stream
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(fileBytes)) {
             Path targetPath = localStorageDir.resolve(objectName).normalize();
             Files.createDirectories(targetPath.getParent());
-            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(bais, targetPath, StandardCopyOption.REPLACE_EXISTING);
             log.info("Successfully saved {} to local disk storage at {}", objectName, targetPath);
         } catch (Exception e) {
             log.error("Failed to save file to local disk storage", e);
