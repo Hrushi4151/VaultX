@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class CorsConfig {
 
-    @Value("${vaultx.cors.allowed-origins:http://localhost:3000,http://localhost:5173,https://vaultx-frontend-zeta.vercel.app}")
+    @Value("${vaultx.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOriginsString;
 
     @Bean
