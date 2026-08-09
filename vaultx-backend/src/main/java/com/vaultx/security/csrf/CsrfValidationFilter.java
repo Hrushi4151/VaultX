@@ -38,7 +38,9 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
             "/api/v1/auth/send-otp",
             "/api/v1/auth/verify-otp",
             "/api/v1/auth/refresh",
-            "/api/v1/admin/auth/login"
+            "/api/v1/admin/auth/login",
+            "/api/v1/documents/upload",
+            "/api/v1/documents/upload/multiple"
     );
 
     @Override
@@ -62,7 +64,14 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 3. Extract CSRF token from header or request parameters
+        // 3. Skip if request has valid Bearer token (JWT authenticated requests are immune to CSRF)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 4. Extract CSRF token from header
         String csrfToken = request.getHeader("X-CSRF-TOKEN");
         if (csrfToken == null || csrfToken.isEmpty()) {
             csrfToken = request.getHeader("X-XSRF-TOKEN");
@@ -70,13 +79,13 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
 
         String clientIp = getClientIp(request);
 
-        // 4. Validate CSRF token against Redis/Fallback store
+        // 5. Validate CSRF token against Redis/Fallback store
         if (csrfToken != null && csrfTokenRepository.validateToken(clientIp, csrfToken)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // If CSRF header is present but empty or invalid, return 403 Forbidden
+        // Return 403 Forbidden only for unauthenticated mutating requests without valid CSRF
         log.warn("CSRF validation failed for client IP {} on {} {}", clientIp, method, path);
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -86,7 +95,7 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
     }
 
     private boolean isExemptPath(String path) {
-        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/actuator")) {
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/actuator") || path.startsWith("/api/v1/documents/upload")) {
             return true;
         }
         return EXEMPT_PATHS.contains(path);
