@@ -80,6 +80,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(message, "BAD_REQUEST", null));
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceeded(
+            org.springframework.web.multipart.MaxUploadSizeExceededException ex, WebRequest request) {
+        log.warn("File upload size limit exceeded: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("File size exceeds the maximum allowed upload limit (100MB).", "FILE_TOO_LARGE", null));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
             AccessDeniedException ex, WebRequest request) {
