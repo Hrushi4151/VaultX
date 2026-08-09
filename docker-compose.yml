@@ -39,17 +39,11 @@ services:
       - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
       - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-604800000}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
-      - FACE_SERVICE_URL=http://vaultx-face-service:8002
-      - OCR_SERVICE_URL=http://vaultx-ocr-service:8003
-      - DEDUP_SERVICE_URL=http://vaultx-deduplication-service:8004
+      - AI_SERVICE_URL=http://vaultx-ai-service:8001
     depends_on:
       postgres:
         condition: service_healthy
-      vaultx-face-service:
-        condition: service_started
-      vaultx-ocr-service:
-        condition: service_started
-      vaultx-deduplication-service:
+      vaultx-ai-service:
         condition: service_started
     networks:
       - vaultx-network
@@ -76,36 +70,14 @@ services:
     networks:
       - vaultx-network
 
-  vaultx-face-service:
+  vaultx-ai-service:
     build:
-      context: ./vaultx-face-service
+      context: ./vaultx-ai-service
       dockerfile: Dockerfile
-    container_name: vaultx-face-service
+    container_name: vaultx-ai-service
     restart: unless-stopped
     ports:
-      - "8002:8002"
-    networks:
-      - vaultx-network
-
-  vaultx-ocr-service:
-    build:
-      context: ./vaultx-ocr-service
-      dockerfile: Dockerfile
-    container_name: vaultx-ocr-service
-    restart: unless-stopped
-    ports:
-      - "8003:8003"
-    networks:
-      - vaultx-network
-
-  vaultx-deduplication-service:
-    build:
-      context: ./vaultx-deduplication-service
-      dockerfile: Dockerfile
-    container_name: vaultx-deduplication-service
-    restart: unless-stopped
-    ports:
-      - "8004:8004"
+      - "8001:8001"
     networks:
       - vaultx-network
 
