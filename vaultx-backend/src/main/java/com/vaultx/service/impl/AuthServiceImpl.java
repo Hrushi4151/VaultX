@@ -44,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final SessionManagementService sessionManagementService;
     private final UserMapper userMapper;
     private final com.vaultx.security.FaceBiometricMatcher faceBiometricMatcher;
+    private final com.vaultx.service.OtpCooldownService otpCooldownService;
 
     private static final int MAX_LOGIN_ATTEMPTS = 5;
     private static final int LOCK_TIME_DURATION_MINUTES = 15;
@@ -66,11 +67,13 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByEmail(email)) {
             throw new BusinessException("Email address is already registered");
         }
+        
+        // Enforce 60s cooldown timer
+        otpCooldownService.checkAndSetCooldown(email);
+
         String otp = String.format("%06d", new Random().nextInt(999999));
         EMAIL_OTP_MAP.put(email, new RegistrationOtpEntry(otp, Instant.now().plus(10, ChronoUnit.MINUTES)));
-        log.info("==================================================================");
-        log.info("GENERATED EMAIL OTP FOR {}: {}", email, otp);
-        log.info("==================================================================");
+        log.info("Email OTP generated and queued for {}", email);
         notificationService.sendEmailOtp(email, otp);
         return otp;
     }
@@ -80,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
         String email = request.getEmail().trim().toLowerCase();
         RegistrationOtpEntry entry = EMAIL_OTP_MAP.get(email);
         if (entry == null || !entry.getOtp().equals(request.getOtp().trim()) || entry.getExpiryDate().isBefore(Instant.now())) {
-            log.warn("Failed Email OTP Verification for {}: Submitted '{}', Expected '{}'", email, request.getOtp(), entry != null ? entry.getOtp() : "NONE");
+            log.warn("Failed Email OTP Verification for {}", email);
             throw new BusinessException("Invalid or expired Email OTP code.");
         }
         EMAIL_OTP_MAP.remove(email);
@@ -93,11 +96,13 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByPhoneNumber(phone)) {
             throw new BusinessException("Phone number is already registered");
         }
+
+        // Enforce 60s cooldown timer
+        otpCooldownService.checkAndSetCooldown(phone);
+
         String otp = String.format("%06d", new Random().nextInt(999999));
         MOBILE_OTP_MAP.put(phone, new RegistrationOtpEntry(otp, Instant.now().plus(10, ChronoUnit.MINUTES)));
-        log.info("==================================================================");
-        log.info("GENERATED MOBILE OTP FOR {}: {}", phone, otp);
-        log.info("==================================================================");
+        log.info("Mobile OTP generated and queued for phone target");
         notificationService.sendSmsOtp(phone, otp);
         return otp;
     }
@@ -127,12 +132,17 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("Phone number is already registered");
         }
 
+        // Enforce 60s cooldown timer
+        otpCooldownService.checkAndSetCooldown(email);
+
         // Generate 6-digit OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
         REGISTRATION_OTP_MAP.put(email, new RegistrationOtpEntry(otp, Instant.now().plus(10, ChronoUnit.MINUTES)));
 
         // Send OTP via SMS and Email
-        notificationService.sendSmsOtp(phone, otp);
+        if (!phone.isEmpty()) {
+            notificationService.sendSmsOtp(phone, otp);
+        }
         notificationService.sendVerificationEmail(email, "Your OTP verification code is: " + otp);
     }
 

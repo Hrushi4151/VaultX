@@ -99,9 +99,8 @@ public class DocumentServiceImpl implements DocumentService {
             throw new BusinessException("Error during virus scan");
         }
 
-        // 2. Validate Type & Size (Size is already handled by Spring max-file-size)
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename == null) originalFilename = "unnamed_file";
+        // 2. Validate and Sanitize Filename
+        String originalFilename = com.vaultx.util.SanitizationUtils.sanitizeFilename(file.getOriginalFilename());
         String extension = FilenameUtils.getExtension(originalFilename).toLowerCase();
         
         List<String> allowedExtensions = List.of("pdf", "doc", "docx", "txt", "png", "jpg", "jpeg");

@@ -46,8 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendEmailOtp(String to, String otp) {
         log.info("==================================================================");
         log.info("PINGRAM EMAIL OTP SENDER");
-        log.info("To: {}", to);
-        log.info("OTP Code: {}", otp);
+        log.info("Sending OTP Email to: {}", to);
         log.info("==================================================================");
 
         try {
@@ -124,8 +123,7 @@ public class NotificationServiceImpl implements NotificationService {
         String formattedPhone = formatPhoneNumber(phoneNumber);
         log.info("==================================================================");
         log.info("PINGRAM SMS NOTIFICATION");
-        log.info("Original Phone: {} | Formatted: {}", phoneNumber, formattedPhone);
-        log.info("OTP Code: {}", otp);
+        log.info("Sending SMS OTP to Formatted Phone: {}", formattedPhone);
         log.info("==================================================================");
 
         if (formattedPhone == null) {

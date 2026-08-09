@@ -1,5 +1,7 @@
 package com.vaultx.security;
 
+import com.vaultx.security.csrf.CsrfValidationFilter;
+import com.vaultx.security.ratelimit.RateLimitingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
  * Spring Security configuration.
- * Stateless JWT-based security; no sessions or CSRF.
+ * Stateless JWT-based security with Rate Limiting, CSRF validation, and Security Filter Chain.
  */
 @Configuration
 @EnableWebSecurity
@@ -30,6 +32,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CsrfValidationFilter csrfValidationFilter;
+    private final RateLimitingFilter rateLimitingFilter;
     private final UserDetailsService userDetailsService;
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -61,6 +65,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(csrfValidationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

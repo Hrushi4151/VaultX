@@ -81,8 +81,29 @@ export default function RegisterPage() {
   };
   const isPasswordStrong = Object.values(passwordStrength).every(Boolean);
 
+  // 60-Second Resend Cooldown Timers
+  const [emailCooldown, setEmailCooldown] = useState(0);
+  const [mobileCooldown, setMobileCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (emailCooldown > 0) {
+      timer = setInterval(() => setEmailCooldown(prev => prev - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [emailCooldown]);
+
+  useEffect(() => {
+    let timer;
+    if (mobileCooldown > 0) {
+      timer = setInterval(() => setMobileCooldown(prev => prev - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [mobileCooldown]);
+
   // Send Email OTP
   const handleSendEmailOtp = async () => {
+    if (emailCooldown > 0) return;
     const isEmailValid = await trigger('email');
     if (!isEmailValid || !email) {
       toast.error('Please enter a valid email address first.');
@@ -93,6 +114,7 @@ export default function RegisterPage() {
     try {
       await authService.sendEmailOtp(email);
       setEmailOtpSent(true);
+      setEmailCooldown(60);
       toast.success(`OTP verification code sent to email: ${email}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send Email OTP.');
@@ -122,6 +144,7 @@ export default function RegisterPage() {
 
   // Send Mobile OTP
   const handleSendMobileOtp = async () => {
+    if (mobileCooldown > 0) return;
     const isPhoneValid = await trigger('phoneNumber');
     if (!isPhoneValid || !phoneNumber) {
       toast.error('Please enter a valid phone number first.');
@@ -132,6 +155,7 @@ export default function RegisterPage() {
     try {
       await authService.sendMobileOtp(phoneNumber);
       setMobileOtpSent(true);
+      setMobileCooldown(60);
       toast.success(`SMS OTP code sent to phone: ${phoneNumber}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send Mobile OTP.');
@@ -400,10 +424,11 @@ export default function RegisterPage() {
                       variant="outline"
                       onClick={handleSendEmailOtp}
                       isLoading={sendingEmailOtp}
+                      disabled={emailCooldown > 0}
                       icon={Send}
-                      className="whitespace-nowrap h-[42px] border-primary text-primary hover:bg-primary/10"
+                      className="whitespace-nowrap h-[42px] border-primary text-primary hover:bg-primary/10 disabled:opacity-50"
                     >
-                      {emailOtpSent ? 'Resend OTP' : 'Send Email OTP'}
+                      {emailCooldown > 0 ? `Resend in ${emailCooldown}s` : (emailOtpSent ? 'Resend OTP' : 'Send Email OTP')}
                     </Button>
                   )}
                 </div>
@@ -464,10 +489,11 @@ export default function RegisterPage() {
                       variant="outline"
                       onClick={handleSendMobileOtp}
                       isLoading={sendingMobileOtp}
+                      disabled={mobileCooldown > 0}
                       icon={Send}
-                      className="whitespace-nowrap h-[42px] border-primary text-primary hover:bg-primary/10"
+                      className="whitespace-nowrap h-[42px] border-primary text-primary hover:bg-primary/10 disabled:opacity-50"
                     >
-                      {mobileOtpSent ? 'Resend SMS' : 'Send Mobile OTP'}
+                      {mobileCooldown > 0 ? `Resend in ${mobileCooldown}s` : (mobileOtpSent ? 'Resend SMS' : 'Send Mobile OTP')}
                     </Button>
                   )}
                 </div>

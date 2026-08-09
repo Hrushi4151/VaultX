@@ -14,23 +14,47 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// ── Request interceptor — attach JWT token ──────────────────────────────────
+/**
+ * Fetch and refresh anti-CSRF token from backend
+ */
+export const fetchCsrfToken = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/api/v1/auth/csrf`);
+    const token = res.data?.data?.csrfToken;
+    if (token) {
+      localStorage.setItem('vaultx_csrf_token', token);
+    }
+    return token;
+  } catch (err) {
+    return localStorage.getItem('vaultx_csrf_token');
+  }
+};
+
+// ── Request interceptor — attach JWT token & CSRF token ──────────────────
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(TOKEN_KEY);
     const refreshToken = localStorage.getItem('vaultx_refresh_token');
+    const csrfToken = localStorage.getItem('vaultx_csrf_token');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     if (refreshToken) {
       config.headers['X-Refresh-Token'] = refreshToken;
     }
+    if (csrfToken) {
+      config.headers['X-CSRF-TOKEN'] = csrfToken;
+    }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ── Response interceptor — handle 401 globally ─────────────────────────────
+// Fetch initial CSRF token on startup
+fetchCsrfToken();
+
+// ── Response interceptor — handle 401 & token refresh ──────────────────────
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -50,6 +74,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
+    // Handle 403 Forbidden due to stale CSRF token
+    if (error.response?.status === 403 && error.response?.data?.message?.includes('CSRF')) {
+      const newCsrf = await fetchCsrfToken();
+      if (newCsrf && !originalRequest._csrfRetry) {
+        originalRequest._csrfRetry = true;
+        originalRequest.headers['X-CSRF-TOKEN'] = newCsrf;
+        return api(originalRequest);
+      }
+    }
+
     // Check if error is 401 and it's not a retry, auth endpoint, or public endpoint
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/') && !originalRequest.url.includes('/public/')) {
       if (isRefreshing) {
@@ -98,19 +132,6 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
-    }
-    
-    // Handle 403 Forbidden (expired or invalidated token)
-    if ((error.response?.status === 403 || error.response?.status === 401) && !originalRequest.url.includes('/auth/') && !originalRequest.url.includes('/public/')) {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem('vaultx_user');
-        localStorage.removeItem('vaultx_refresh_token');
-        if (
-            !window.location.pathname.includes('/login') && 
-            (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))
-        ) {
-            window.location.href = '/login';
-        }
     }
 
     return Promise.reject(error);
