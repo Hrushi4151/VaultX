@@ -11,6 +11,13 @@ spring:
     password: ${DB_PASSWORD:vaultx_1234}
     driver-class-name: org.postgresql.Driver
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
     hikari:
       pool-name: VaultXHikariPool
       maximum-pool-size: 10
